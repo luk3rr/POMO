@@ -1,0 +1,26 @@
+# EXE
+bin/program
+bin/unit_test
+
+# OBJ file
+*.o
+
+# VS to debug :')
+.vscode
+
+# CMake files
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+build/**/Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+build/**/Makefile
+build/libs/*
+build/**/*
+bin/**/*
