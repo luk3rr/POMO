@@ -16,6 +16,7 @@ class Timer:
     """
 
     def __init__(self, remtime):
+        self.total = remtime
         self.time = remtime
         self.notified = False
         self.tick()
@@ -39,6 +40,7 @@ class Timer:
         else:
             rem = -self.time
             neg = "-"
+
         days = int(rem // DAY_FACTOR)
         rem -= days * DAY_FACTOR
         hours = int(rem // HOUR_FACTOR)
@@ -50,6 +52,7 @@ class Timer:
         strtime = []
         if days > 0:
             strtime.append(str(days))
+
         if days > 0 or hours > 0:
             strtime.append("{:02d}".format(hours))
 
@@ -93,3 +96,9 @@ class Timer:
         Change the time
         """
         self.time = op(self.time, seconds)
+
+    def get_elapsed(self):
+        """
+        Get the elapsed time
+        """
+        return self.total - self.time

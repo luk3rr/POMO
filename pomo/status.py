@@ -20,14 +20,13 @@ class Status:
     Status class to keep track of the timer and the current status
     """
 
-    def __init__(self, worktime, breaktime, saveto):
+    def __init__(self, worktime, breaktime):
         self.worktime = worktime
         self.breaktime = breaktime
         self.status = "work"  # or "break"
-        self.active = False  # Pause or running
+        self.active = False # Pause or running
         self.timer = Timer(self.worktime)
         self.locked = True
-        self.saveto = saveto
         self.server_socket = self.setup_socket()
         self.existConection = False
         self.client_socket = None

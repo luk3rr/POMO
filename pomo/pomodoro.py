@@ -14,9 +14,6 @@ from contextlib import contextmanager
 
 from .config import (
     SOCKFILE,
-    SQL_INSERT_CMD,
-    SQL_UPDATE_TABLE_CMD,
-    SQL_CREATE_TABLE_CMD,
     PACKET_SIZE,
 )
 from .utils import Exit
@@ -30,7 +27,8 @@ class Pomodoro:
     """
 
     def __init__(self, args):
-        self.status = Status(args.worktime, args.breaktime, args.database)
+        self.status = Status(args.worktime, args.breaktime)
+        self.pending_db_update = False
         self.args = args
         self.log_manager = LogManager()
 
@@ -39,8 +37,8 @@ class Pomodoro:
         """
         Setup the connection to the database
         """
-        # check if the database exist
 
+        # check if the database exist
         path = os.path.expanduser(path)
 
         if not os.path.isfile(path):
@@ -51,28 +49,55 @@ class Pomodoro:
         session = sqlite3.connect(path)
 
         cur = session.cursor()
-        cur.execute(SQL_CREATE_TABLE_CMD)
+        cur.execute(
+            """CREATE TABLE IF NOT EXISTS sessions (
+                            date TEXT,
+                            start TEXT,
+                            duration TEXT,
+                            tag TEXT);
+                       """
+        )
 
         self.log_manager.log(f"Connected to database: {path}")
 
         try:
             yield cur
         finally:
+            self.log_manager.log("Closing database connection")
             session.commit()
             session.close()
 
-    def save(self):
+    def save(self, opcode="s"):
         """
         Save the current session to the database
+
+        opcode: str
+            s: save
+            u: update
         """
-        if self.args.database:
+        self.log_manager.log(f"{self.status.status} {opcode}")
+        if self.status.status == "work":
             with self.setup_db_connection(self.args.database) as session:
-                if self.status.active:
-                    session.execute(SQL_INSERT_CMD)
+                if opcode == "s" and not self.pending_db_update:
+                    session.execute(
+                        "INSERT INTO sessions VALUES (date('now'), time('now'), NULL, NULL);"
+                    )
                     self.log_manager.log("Saved session to database")
-                else:
-                    session.execute(SQL_UPDATE_TABLE_CMD)
+                    self.pending_db_update = True
+
+                elif opcode == "u" and self.pending_db_update:
+                    duration = self.status.timer.get_elapsed()
+                    session.execute(
+                        f"""UPDATE sessions
+                          SET duration = '{duration}'
+                          WHERE start IN (
+                             SELECT start FROM sessions
+                             ORDER BY start DESC
+                             LIMIT 1);
+                        """
+                    )
                     self.log_manager.log("Updated session in database")
+                    self.pending_db_update = False
 
     @contextmanager
     def setup_listener(self):
@@ -160,14 +185,12 @@ class Pomodoro:
         action = data.decode("utf8")
 
         if action == "toggle":
+            self.save(opcode="s")
             status.toggle()
-            if self.args.database and self.status.status == "work":
-                self.save()
 
         elif action == "end":
+            self.save(opcode="u")
             status.next_timer()
-            if self.args.database and self.status.status == "work":
-                self.save()
 
         elif action == "lock":
             status.toggle_lock()
@@ -236,24 +259,28 @@ class Pomodoro:
         """
         Display the timer
         """
-
-        status = Status(self.args.worktime, self.args.breaktime, self.args.database)
-
         run_msg = "Pomodoro timer running..."
         print(run_msg)
         self.log_manager.log(run_msg)
 
         # Listen on socket
         with self.setup_listener() as sock:
-            while True:
-                status.update()
-                status.send_status()
+            try:
+                while True:
+                    self.status.update()
+                    self.status.send_status()
 
-                try:
-                    self.check_actions(sock, status)
+                    try:
+                        self.check_actions(sock, self.status)
 
-                except Exit:
-                    exit_msg = "Received exit request..."
-                    print(exit_msg)
-                    self.log_manager.log(exit_msg)
-                    break
+                    except Exit:
+                        exit_msg = "Received exit request..."
+                        print(exit_msg)
+                        self.log_manager.log(exit_msg)
+                        break
+
+            # Ctrl+C
+            except KeyboardInterrupt:
+                keyboard_msg = "Keyboard interrupt received, exiting..."
+                self.log_manager.log(keyboard_msg)
+                print(keyboard_msg)
