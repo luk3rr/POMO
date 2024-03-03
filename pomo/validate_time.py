@@ -11,6 +11,7 @@ class ValidateTime(argparse.Action):
     """
     Validate time format
     """
+
     def __call__(self, parser, namespace, values, option_string=None):
         if values[0] not in "-+":
             parser.error(
