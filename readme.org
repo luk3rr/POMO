@@ -49,6 +49,8 @@ $ python3 -m pomo lock # Alterna o bloqueio do incremento e decremento do relóg
 #+end_src
 
 * Architecture
+[[file:data/img/architecture.png]]
+
 ** Modules
 *** Pomo
 Pomo é o módulo principal do programa. As principais classes desse módulo são:
