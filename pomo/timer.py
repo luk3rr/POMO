@@ -5,9 +5,18 @@
 # Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
 
 import time
-from subprocess import call, DEVNULL
+from subprocess import call, DEVNULL, Popen
 
-from .config import DAY_FACTOR, HOUR_FACTOR, MINUTE_FACTOR
+from .log_manager import LogManager
+
+from .config import (
+    DAY_FACTOR,
+    HOUR_FACTOR,
+    MINUTE_FACTOR,
+    BELL_SOUND,
+    TIMER_SOUND,
+    PLAYER,
+)
 
 
 class Timer:
@@ -19,7 +28,9 @@ class Timer:
         self.total = remtime
         self.time = remtime
         self.notified = False
+        self.sound_played = False
         self.tick()
+        self.log_manager = LogManager()
 
     def __str__(self):
         return self.format_time()
@@ -70,6 +81,10 @@ class Timer:
         delta = now - self.previous
         self.time -= delta
 
+        if self.time < 4 and not self.sound_played:
+            self.play_sound(TIMER_SOUND)
+            self.sound_played = True
+
         # Send a notification when timer reaches 0
         if not self.notified and self.time < 0:
             self.notified = True
@@ -87,6 +102,8 @@ class Timer:
                     stdout=DEVNULL,
                     stderr=DEVNULL,
                 )
+
+                self.play_sound(BELL_SOUND)
             except FileNotFoundError:
                 # Skip if notify-send isn't installed
                 pass
@@ -102,3 +119,14 @@ class Timer:
         Get the elapsed time
         """
         return self.total - self.time
+
+    def play_sound(self, sound):
+        """
+        Play a sound asynchronously
+        """
+        try:
+            Popen([PLAYER, sound], stdout=DEVNULL, stderr=DEVNULL)
+            self.log_manager.log(f"Playing sound {sound}")
+        except Exception as e:
+            self.log_manager.log(f"Error playing sound {sound}")
+            self.log_manager.log(f"Error message: {str(e)}")
