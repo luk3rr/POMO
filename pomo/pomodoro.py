@@ -22,7 +22,7 @@ from .config import (
 from .utils import Exit
 from .log_manager import LogManager
 from .status import Status
-
+from .db_manager import DBManager
 
 
 class Pomodoro:
@@ -35,98 +35,8 @@ class Pomodoro:
         self.pending_db_update = False
         self.args = args
         self.log_manager = LogManager()
+        self.db_manager = DBManager()
 
-    @contextmanager
-    def setup_db_connection(self, path):
-        """
-        Setup the connection to the database
-        """
-
-        # check if the database exist
-        path = os.path.expanduser(path)
-
-        if not os.path.isfile(path):
-            self.log_manager.log(f"Database {path} does not exist, creating it...")
-            with open(path, "w") as f:
-                f.write("")
-
-        session = sqlite3.connect(path)
-
-        cur = session.cursor()
-        cur.execute(
-            """CREATE TABLE IF NOT EXISTS sessions (
-                            date TEXT,
-                            start TEXT,
-                            duration TEXT,
-                            tag TEXT);
-                       """
-        )
-
-        self.log_manager.log(f"Connected to database: {path}")
-
-        try:
-            yield cur
-        finally:
-            self.log_manager.log("Closing database connection")
-            session.commit()
-            session.close()
-
-    def db_create_session(self):
-        """
-        Create a session in the database
-        """
-        if self.status.status == "work":
-            with self.setup_db_connection(self.args.database) as session:
-                if not self.pending_db_update:
-                    current_time_gmt = datetime.utcnow() + timedelta(hours=GMT_OFFSET)
-                    formatted_date = current_time_gmt.strftime('%Y-%m-%d')
-                    formatted_time = current_time_gmt.strftime('%H:%M:%S')
-
-                    session.execute(
-                        f"INSERT INTO sessions VALUES ('{formatted_date}', '{formatted_time}', NULL, '{self.status.tag}');"
-                    )
-                    self.log_manager.log("Created session in database")
-                    self.pending_db_update = True
-
-
-    def db_finish_session(self):
-        """
-        Finish the session in the database
-        """
-        if self.status.status == "work":
-            with self.setup_db_connection(self.args.database) as session:
-                if self.pending_db_update:
-                    duration = self.status.timer.get_elapsed()
-                    session.execute(
-                        f"""UPDATE sessions
-                          SET duration = '{duration}'
-                          WHERE start IN (
-                             SELECT start FROM sessions
-                             ORDER BY date DESC, start DESC
-                             LIMIT 1);
-                        """
-                    )
-
-                    self.log_manager.log("Finished session in database")
-                    self.pending_db_update = False
-
-    def db_update_tag(self, tag):
-        """
-        Update the tag in the database
-        """
-        with self.setup_db_connection(self.args.database) as session:
-            if self.pending_db_update:
-                session.execute(
-                    f"""UPDATE sessions
-                    SET tag = '{tag}'
-                    WHERE start IN (
-                        SELECT start FROM sessions
-                        ORDER BY date DESC, start DESC
-                        LIMIT 1);
-                    """
-                )
-
-                self.log_manager.log("Updated tag in database")
 
     @contextmanager
     def setup_listener(self):
@@ -214,11 +124,13 @@ class Pomodoro:
         action = data.decode("utf8")
 
         if action == "toggle":
-            self.db_create_session()
+            if self.status.status == "work":
+                self.db_manager.create_session(self.status.tag)
             status.toggle()
 
         elif action == "end":
-            self.db_finish_session()
+            if self.status.status == "work":
+                self.db_manager.finish_session(self.status.timer.get_elapsed())
             status.next_timer()
 
         elif action == "lock":
@@ -226,7 +138,7 @@ class Pomodoro:
 
         elif action.startswith("tag"):
             _, tag = action.split(" ")
-            self.db_update_tag(tag)
+            self.db_manager.update_tag(tag)
             status.change_tag(tag)
 
         elif action.startswith("time"):
