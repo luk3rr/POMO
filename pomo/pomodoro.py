@@ -11,15 +11,18 @@ import time
 import select
 
 from contextlib import contextmanager
+from datetime import datetime, timedelta
 
 from .config import (
     SOCKFILE,
     PACKET_SIZE,
+    GMT_OFFSET
 )
 
 from .utils import Exit
 from .log_manager import LogManager
 from .status import Status
+
 
 
 class Pomodoro:
@@ -75,8 +78,12 @@ class Pomodoro:
         if self.status.status == "work":
             with self.setup_db_connection(self.args.database) as session:
                 if not self.pending_db_update:
+                    current_time_gmt = datetime.utcnow() + timedelta(hours=GMT_OFFSET)
+                    formatted_date = current_time_gmt.strftime('%Y-%m-%d')
+                    formatted_time = current_time_gmt.strftime('%H:%M:%S')
+
                     session.execute(
-                        f"INSERT INTO sessions VALUES (date('now'), time('now'), NULL, '{self.status.tag}');"
+                        f"INSERT INTO sessions VALUES ('{formatted_date}', '{formatted_time}', NULL, '{self.status.tag}');"
                     )
                     self.log_manager.log("Created session in database")
                     self.pending_db_update = True
