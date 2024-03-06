@@ -117,3 +117,11 @@ class DBManager:
                 )
 
                 self.log_manager.log("Updated tag in database")
+
+    def perform_query(self, query):
+        """
+        Perform a query in the database
+        """
+        with self.setup_connection(self.database) as session:
+            self.log_manager.log(f"Performing query: {query}")
+            return session.execute(query).fetchall()
