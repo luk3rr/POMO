@@ -12,6 +12,7 @@ SERVER_SOCKFILE = os.path.join(SOCKDIR, "server-pomo.sock")
 
 LOGFILE = "/tmp/pomo.log"
 DB_FILE = "~/Documents/pomo.db"
+DEFAULT_TAG = "other"
 
 DAY_FACTOR = 86400
 HOUR_FACTOR = 3600

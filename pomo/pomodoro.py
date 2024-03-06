@@ -16,6 +16,7 @@ from .config import (
     SOCKFILE,
     PACKET_SIZE,
 )
+
 from .utils import Exit
 from .log_manager import LogManager
 from .status import Status
@@ -27,7 +28,7 @@ class Pomodoro:
     """
 
     def __init__(self, args):
-        self.status = Status(args.worktime, args.breaktime)
+        self.status = Status(args.worktime, args.breaktime, args.tag)
         self.pending_db_update = False
         self.args = args
         self.log_manager = LogManager()
@@ -67,37 +68,58 @@ class Pomodoro:
             session.commit()
             session.close()
 
-    def save(self, opcode="s"):
+    def db_create_session(self):
         """
-        Save the current session to the database
-
-        opcode: str
-            s: save
-            u: update
+        Create a session in the database
         """
-        self.log_manager.log(f"{self.status.status} {opcode}")
         if self.status.status == "work":
             with self.setup_db_connection(self.args.database) as session:
-                if opcode == "s" and not self.pending_db_update:
+                if not self.pending_db_update:
                     session.execute(
-                        "INSERT INTO sessions VALUES (date('now'), time('now'), NULL, NULL);"
+                        f"INSERT INTO sessions VALUES (date('now'), time('now'), NULL, '{self.status.tag}');"
                     )
-                    self.log_manager.log("Saved session to database")
+                    self.log_manager.log("Created session in database")
                     self.pending_db_update = True
 
-                elif opcode == "u" and self.pending_db_update:
+
+    def db_finish_session(self):
+        """
+        Finish the session in the database
+        """
+        if self.status.status == "work":
+            with self.setup_db_connection(self.args.database) as session:
+                if self.pending_db_update:
                     duration = self.status.timer.get_elapsed()
                     session.execute(
                         f"""UPDATE sessions
                           SET duration = '{duration}'
                           WHERE start IN (
                              SELECT start FROM sessions
-                             ORDER BY start DESC
+                             ORDER BY date DESC, start DESC
                              LIMIT 1);
                         """
                     )
-                    self.log_manager.log("Updated session in database")
+
+                    self.log_manager.log("Finished session in database")
                     self.pending_db_update = False
+
+    def db_update_tag(self, tag):
+        """
+        Update the tag in the database
+        """
+        with self.setup_db_connection(self.args.database) as session:
+            if self.pending_db_update:
+                session.execute(
+                    f"""UPDATE sessions
+                    SET tag = '{tag}'
+                    WHERE start IN (
+                        SELECT start FROM sessions
+                        ORDER BY date DESC, start DESC
+                        LIMIT 1);
+                    """
+                )
+
+                self.log_manager.log("Updated tag in database")
 
     @contextmanager
     def setup_listener(self):
@@ -185,15 +207,20 @@ class Pomodoro:
         action = data.decode("utf8")
 
         if action == "toggle":
-            self.save(opcode="s")
+            self.db_create_session()
             status.toggle()
 
         elif action == "end":
-            self.save(opcode="u")
+            self.db_finish_session()
             status.next_timer()
 
         elif action == "lock":
             status.toggle_lock()
+
+        elif action.startswith("tag"):
+            _, tag = action.split(" ")
+            self.db_update_tag(tag)
+            status.change_tag(tag)
 
         elif action.startswith("time"):
             _, op, seconds = action.split(" ")
@@ -237,6 +264,15 @@ class Pomodoro:
             msg = "time " + " ".join(args.delta)
             s.send(msg.encode("utf8"))
             self.log_manager.log(f"Changed timer by {args.delta}")
+
+    def action_change_tag(self, args):
+        """
+        Change the tag
+        """
+        with self.setup_client() as s:
+            msg = "tag " + args.tag
+            s.send(msg.encode("utf8"))
+            self.log_manager.log(f"Changed tag to {args.tag}")
 
     def action_exit(self, args, warn=True):
         """

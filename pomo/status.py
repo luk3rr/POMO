@@ -20,15 +20,16 @@ class Status:
     Status class to keep track of the timer and the current status
     """
 
-    def __init__(self, worktime, breaktime):
+    def __init__(self, worktime, breaktime, tag):
         self.worktime = worktime
         self.breaktime = breaktime
         self.status = "work"  # or "break"
+        self.tag = tag
         self.active = False # Pause or running
         self.timer = Timer(self.worktime)
         self.locked = True
         self.server_socket = self.setup_socket()
-        self.existConection = False
+        self.existConnection = False
         self.client_socket = None
         self.client_addr = None
         self.log_manager = LogManager()
@@ -57,12 +58,12 @@ class Status:
         Send the status to the socket
         """
 
-        if not self.existConection:
+        if not self.existConnection:
             self.server_socket.settimeout(SOCKET_TIMEOUT)
 
             try:
                 self.client_socket, self.client_addr = self.server_socket.accept()
-                self.existConection = True
+                self.existConnection = True
 
             except socket.error:
                 pass
@@ -81,7 +82,7 @@ class Status:
 
             except BrokenPipeError:
                 self.log_manager.log("Lost connection to client. Waiting for new connection...")
-                self.existConection = False
+                self.existConnection = False
                 self.server_socket = self.setup_socket()
 
     def get_timer(self):
@@ -147,3 +148,19 @@ class Status:
             self.active = False
             self.status = "work"
             self.timer = Timer(self.worktime)
+
+    def change_tag(self, tag):
+        """
+        Change the tag of the current session
+        """
+        old_tag = self.tag
+        self.tag = self.sanitize_tag(tag)
+
+        self.log_manager.log(f"Updated tag from {old_tag} to {self.tag}")
+
+    def sanitize_tag(self, tag):
+        """
+        Sanitize the tag
+        Gets only the first word of the tag
+        """
+        return tag.split(" ")[0]
