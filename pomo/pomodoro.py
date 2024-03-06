@@ -5,18 +5,15 @@
 # Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
 
 import os
-import sqlite3
 import socket
 import time
 import select
 
 from contextlib import contextmanager
-from datetime import datetime, timedelta
 
 from .config import (
     SOCKFILE,
     PACKET_SIZE,
-    GMT_OFFSET
 )
 
 from .utils import Exit

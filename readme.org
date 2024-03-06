@@ -1,1 +1,82 @@
 * POMO
+O Pomo é um temporizador desenvolvido com o objetivo de oferecer uma maneira simples de aplicar a técnica [[https://en.wikipedia.org/wiki/Pomodoro_Technique][Pomodoro]], uma técnica de gerenciamento de tempo popular. Além disso, o projeto possibilita a integração do temporizador com outros programas, transmitindo dados por meio de sockets. O Pomo também inclui um módulo específico para análise de dados, proporcionando uma visão mais aprofundada do uso do temporizador.
+
+* Table of Contents
++ [[#Usage][Usage]]
++ [[#Architecture][Architecture]]
+  + [[#Modules][Modules]]
+* Usage
+Crie uma instância de execução do módulo Pomo com o seguinte comando:
+#+begin_src sh
+$ python3 -m pomo
+#+end_src
+
+OBS.: Talvez seja interessante adicionar o projeto ao path do seu SO:
+
+#+begin_src sh
+$ export PATH=$PATH:/caminho/para/POMO
+#+end_src
+
+A instância que executa em background também pode ser inicializa definindo alguns parâmetros. Esse parâmetros também são configuráveis no arquivo =pomo/config.py=.
+
+OBS.: A duração de worktime e breaktime são dadas e segundos.
+
+#+begin_src sh
+$ python3 -m pomo --worktime 2700 --breaktime 300 --saveto ~/Documents/pomo.db
+#+end_src
+
+A partir desse momento, o gerenciamento do temporizador pode ser realizado, iniciando /worktimes/ ou /breaktimes/, ou pausando o relógio:
+
+#+begin_src sh
+$ python3 -m pomo toggle # Pause ou ative o relógio
+#+end_src
+
+
+#+begin_src sh
+$ python3 -m pomo end # Finalize o worktime ou breaktime atual
+#+end_src
+
+O temporizador funciona em ciclos, ou seja, ao finalizar um worktime, inicializamos um breaktime, e ao finalizar um breaktime, um worktime é iniciado.
+
+#+begin_src sh
+$ python3 -m pomo time +60 # Incrementa o relógio em 60s
+#+end_src
+
+O comando acima adiciona 1min ao relógio. Também poderia ser utilizado o sinal de subtração para diminuir o tempo do relógio.
+
+#+begin_src sh
+$ python3 -m pomo lock # Alterna o bloqueio do incremento e decremento do relógio
+#+end_src
+
+* Architecture
+** Modules
+*** Pomo
+Pomo é o módulo principal do programa. As principais classes desse módulo são:
+1. *DBManager*: Acessa e manipula o banco de dados
+2. *LogManager*: Gerencia as mensagens de log
+3. *Status*: Gerencia cada worktime e breaktime
+4. *Timer*: Relógio que contabiliza o tempo a cada instante
+5. *Pomodoro*: Executa todos os comandos enviados pelo usuário e fornece os dados do programa através de sockets.
+
+*** Polybar-pomo
+Pomo pode ser integrado com o [[https://github.com/polybar/polybar][Polybar]]. Um exemplo de configuração:
+
+#+begin_src dosini
+[module/pomodoro]
+type = custom/script
+exec = python3 -m polybar-pomo
+
+tail = true
+label = %output%
+format-prefix-foreground = ${colors.foreground-alt}
+format-underline = ${colors.underline}
+
+click-left = python3 -m pomo toggle
+click-right = python3 -m pomo end
+click-middle = python3 -m pomo lock
+scroll-up = python3 -m pomo time +60
+scroll-down = python3 -m pomo time -60
+#+end_src
+
+*** Analytics
+A principal função desse módulo e fazer uma analise dos dados disponíveis no banco de dados, de forma que o usuário possa avaliar a sua performance com relação ao uso da técnica Pomodoro.
