@@ -92,9 +92,11 @@ class Analytics:
         df['date'] = pd.to_datetime(df['date'])
         df['total_duration_hours'] = df['total_duration'] / HOUR_FACTOR
 
+        total_sum_hours = total_sum[0][0] / HOUR_FACTOR if total_sum[0][0] else 0
+
         plt.figure(figsize=(10, 6))
         plt.bar(df['date'].dt.strftime('%Y-%m-%d'), df['total_duration_hours'], color='darkblue', label='Per Day')
-        plt.axhline(y=total_sum[0][0] / HOUR_FACTOR, color='red', linestyle='--', label='Total')
+        plt.axhline(y=total_sum_hours, color='red', linestyle='--', label='Total')
         plt.title('Sum of duration per day with total')
         plt.xlabel('Date')
         plt.ylabel('Total duration (hours)')
