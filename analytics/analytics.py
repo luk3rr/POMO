@@ -4,7 +4,11 @@
 # Created on: March  6, 2024
 # Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
 
+import matplotlib.pyplot as plt
+import pandas as pd
+
 from datetime import datetime
+
 
 from pomo.config import DB_FILE, DB_TABLE_NAME, HOUR_FACTOR, MINUTE_FACTOR
 from pomo.db_manager import DBManager
@@ -31,6 +35,9 @@ class Analytics:
         """
         Convert seconds to hours and minutes
         """
+        if seconds is None:
+            return 0, 0
+
         hours = seconds // HOUR_FACTOR
         minutes = (seconds % HOUR_FACTOR) // MINUTE_FACTOR
         return int(hours), int(minutes)
@@ -77,18 +84,36 @@ class Analytics:
 
         # Query and print total sum
         total_sum = self.query_total_sum(start, end)
-        hours, minutes = self.seconds_to_hours_minutes(total_sum[0][0])
-        print(f"Total time between {start} and {end}: {hours:02d}h{minutes:02d}min")
 
         # Query and print sum per day
         sum_per_day = self.query_sum_per_day(start, end)
-        for day in sum_per_day:
-            hours, minutes = self.seconds_to_hours_minutes(day[1])
-            print(f"{day[0]}: {hours:02d}h{minutes:02d}min")
+
+        df = pd.DataFrame(sum_per_day, columns=["date", "total_duration"])
+        df['date'] = pd.to_datetime(df['date'])
+        df['total_duration_hours'] = df['total_duration'] / HOUR_FACTOR
+
+        plt.figure(figsize=(10, 6))
+        plt.bar(df['date'].dt.strftime('%Y-%m-%d'), df['total_duration_hours'], color='darkblue', label='Per Day')
+        plt.axhline(y=total_sum[0][0] / HOUR_FACTOR, color='red', linestyle='--', label='Total')
+        plt.title('Sum of duration per day with total')
+        plt.xlabel('Date')
+        plt.ylabel('Total duration (hours)')
+        plt.xticks(rotation=45)
+        plt.legend()
+        plt.tight_layout()
+        plt.show()
 
         # Query and print sum per tag
         sum_per_tag = self.query_sum_per_tag(start, end)
-        for tag_result in sum_per_tag:
-            tag = tag_result[0]
-            hours, minutes = self.seconds_to_hours_minutes(tag_result[1])
-            print(f"Total time for tag '{tag}' between {start} and {end}: {hours:02d}h{minutes:02d}min")
+
+        df = pd.DataFrame(sum_per_tag, columns=["tag", "total_duration"])
+        df['total_duration_hours'] = df['total_duration'] / HOUR_FACTOR
+
+        plt.figure(figsize=(10, 6))
+        plt.bar(df['tag'], df['total_duration_hours'], color='darkblue')
+        plt.title(f'Sum of duration per tag considering the period {start} to {end}')
+        plt.xlabel('Tag')
+        plt.ylabel('Total duration (hours)')
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        plt.show()
