@@ -90,4 +90,4 @@ class Integration:
         if not data["active"]:
             status = PAUSE
 
-        return f"{ICON_COLOR}{status}{RESET_COLOR} {data['timer']}\n"
+        return f"{ICON_COLOR}{status}{RESET_COLOR}  {data['timer']}\n"
