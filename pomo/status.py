@@ -9,6 +9,8 @@ import sys
 import operator
 import socket
 import json
+import subprocess
+import re
 
 from .timer import Timer
 from .config import SERVER_SOCKFILE, SOCKET_TIMEOUT
@@ -120,6 +122,10 @@ class Status:
         """
         if self.active:
             self.timer.update()
+            if self.is_system_active():
+                self.log_manager.log("System is in suspend. Pausing timer...")
+                self.toggle()
+
         # This ensures the timer counts time since the last iteration
         # and not since it was initialized
         self.timer.tick()
@@ -164,3 +170,21 @@ class Status:
         Gets only the first word of the tag
         """
         return tag.split(" ")[0]
+
+    def is_system_active(self):
+        """
+        Check if the system is in suspend
+        """
+        try:
+            result = subprocess.run(["systemctl",
+                                     "is-active",
+                                     "sleep.target",
+                                     "suspend.target",
+                                     "hibernate.target"],
+                                    capture_output=True,
+                                    text=True).stdout.split('\n')
+
+            return 'active' in result
+
+        except subprocess.CalledProcessError:
+            return False
