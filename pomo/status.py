@@ -28,7 +28,7 @@ class Status:
         self.status = "work"  # or "break"
         self.tag = tag
         self.active = False # Pause or running
-        self.timer = Timer(self.worktime)
+        self.timer = Timer(self.worktime, self.tag, self.status)
         self.locked = True
         self.server_socket = self.setup_socket()
         self.existConnection = False
@@ -149,11 +149,11 @@ class Status:
             if self.active:
                 self.active = False
             self.status = "break"
-            self.timer = Timer(self.breaktime)
+            self.timer = Timer(self.breaktime, self.tag, self.status)
         elif self.status == "break":
             self.active = False
             self.status = "work"
-            self.timer = Timer(self.worktime)
+            self.timer = Timer(self.worktime, self.tag, self.status)
 
     def change_tag(self, tag):
         """
@@ -161,8 +161,24 @@ class Status:
         """
         old_tag = self.tag
         self.tag = self.sanitize_tag(tag)
+        self.timer.update_tag(self.tag)
 
         self.log_manager.log(f"Updated tag from {old_tag} to {self.tag}")
+
+        try:
+            subprocess.call(["notify-send",
+                                "-t",
+                                "5000",
+                                "-u",
+                                "normal",
+                                "Pomodoro",
+                                f"Updated tag to '{self.tag}'"],
+                                stdout=subprocess.DEVNULL,
+                                stderr=subprocess.DEVNULL,
+                            )
+        except FileNotFoundError:
+            # Skip if notify-send isn't installed
+            pass
 
     def sanitize_tag(self, tag):
         """

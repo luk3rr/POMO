@@ -24,11 +24,14 @@ class Timer:
     Timer class to keep track of the time
     """
 
-    def __init__(self, remtime):
+    def __init__(self, remtime, tag, timer_label):
         self.total = remtime
         self.time = remtime
-        self.notified = False
+        self.notified_finish = False
+        self.notified_start = False
         self.sound_played = False
+        self.tag = tag
+        self.timer_label = timer_label
         self.tick()
         self.log_manager = LogManager()
 
@@ -86,14 +89,14 @@ class Timer:
             self.sound_played = True
 
         # Send a notification when timer reaches 0
-        if not self.notified and self.time < 0:
-            self.notified = True
+        if not self.notified_finish and self.time < 0:
+            self.notified_finish = True
             try:
                 call(
                     [
                         "notify-send",
                         "-t",
-                        "0",
+                        "5000",
                         "-u",
                         "critical",
                         "Pomodoro",
@@ -104,6 +107,27 @@ class Timer:
                 )
 
                 self.play_sound(BELL_SOUND)
+            except FileNotFoundError:
+                # Skip if notify-send isn't installed
+                pass
+
+        # Send notification when starting the work time
+        if not self.notified_start and self.timer_label == "work":
+            self.notified_start = True
+            try:
+                call(
+                    [
+                        "notify-send",
+                        "-t",
+                        "5000",
+                        "-u",
+                        "normal",
+                        "Pomodoro",
+                        f"Starting timer with tag '{self.tag}'",
+                    ],
+                    stdout=DEVNULL,
+                    stderr=DEVNULL,
+                )
             except FileNotFoundError:
                 # Skip if notify-send isn't installed
                 pass
@@ -130,3 +154,9 @@ class Timer:
         except Exception as e:
             self.log_manager.log(f"Error playing sound {sound}")
             self.log_manager.log(f"Error message: {str(e)}")
+
+    def update_tag(self, tag):
+        """
+        Update the tag
+        """
+        self.tag = tag
