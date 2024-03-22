@@ -22,6 +22,9 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 BELL_SOUND = os.path.join(SCRIPT_DIR, "../data/sounds/bell.ogg")
 TIMER_SOUND = os.path.join(SCRIPT_DIR, "../data/sounds/timer.ogg")
 
+# Notification icon
+TOMATO_ICON = os.path.join(SCRIPT_DIR, "../data/img/tomato.png")
+
 # Define the sound player
 PLAYER = "paplay"
 

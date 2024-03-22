@@ -10,10 +10,9 @@ import operator
 import socket
 import json
 import subprocess
-import re
 
 from .timer import Timer
-from .config import SERVER_SOCKFILE, SOCKET_TIMEOUT
+from .config import SERVER_SOCKFILE, SOCKET_TIMEOUT, TOMATO_ICON
 from .log_manager import LogManager
 
 
@@ -171,6 +170,8 @@ class Status:
                                 "5000",
                                 "-u",
                                 "normal",
+                                "-i",
+                                TOMATO_ICON,
                                 "Pomodoro",
                                 f"Updated tag to '{self.tag}'"],
                                 stdout=subprocess.DEVNULL,

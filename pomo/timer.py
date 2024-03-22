@@ -16,6 +16,7 @@ from .config import (
     BELL_SOUND,
     TIMER_SOUND,
     PLAYER,
+    TOMATO_ICON,
 )
 
 
@@ -99,6 +100,8 @@ class Timer:
                         "5000",
                         "-u",
                         "critical",
+                        "-i",
+                        TOMATO_ICON,
                         "Pomodoro",
                         "Timer reached zero",
                     ],
@@ -122,6 +125,8 @@ class Timer:
                         "5000",
                         "-u",
                         "normal",
+                        "-i",
+                        TOMATO_ICON,
                         "Pomodoro",
                         f"Starting timer with tag '{self.tag}'",
                     ],
