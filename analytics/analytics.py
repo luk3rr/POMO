@@ -23,11 +23,35 @@ class Analytics:
     def __del__(self):
         pass
 
-    def is_date_valid(self, date):
-        """ """
+    def is_valid_date_format(self, date):
+        """
+        Verify if the date is in the correct format.
+
+        Returns:
+            bool: True if the date is in the correct format, False otherwise.
+        """
+
         try:
             datetime.strptime(date, "%Y-%m-%d")
             return True
+
+        except ValueError:
+            return False
+
+    def is_valid_date_range(self, begin, end):
+        """
+        Verify if the start date is before the end date.
+
+        Returns:
+            bool: True if the start date is before the end date, False otherwise.
+        """
+
+        try:
+            begin_date = datetime.strptime(begin, "%Y-%m-%d")
+            end_date = datetime.strptime(end, "%Y-%m-%d")
+
+            return begin_date <= end_date
+
         except ValueError:
             return False
 
@@ -78,9 +102,12 @@ class Analytics:
         """
         Prints the performance metrics between start and end dates
         """
-        if not self.is_date_valid(start) or not self.is_date_valid(end):
-            print("Invalid date format")
-            return
+
+        assert self.is_valid_date_format(start), f"Invalid date format {start}"
+        assert self.is_valid_date_format(end), f"Invalid date format {end}"
+        assert self.is_valid_date_range(start, end), "Invalid date range"
+
+        print(f"Performance between {start} and {end}")
 
         # Query and print total sum
         total_sum = self.query_total_sum(start, end)
@@ -92,12 +119,14 @@ class Analytics:
         df['date'] = pd.to_datetime(df['date'])
         df['total_duration_hours'] = df['total_duration'] / HOUR_FACTOR
 
-        total_sum_hours = total_sum[0][0] / HOUR_FACTOR if total_sum[0][0] else 0
+        # total_sum_hours = total_sum[0][0] / HOUR_FACTOR if total_sum[0][0] else 0
+
+        get_hours, get_minutes = self.seconds_to_hours_minutes(total_sum[0][0])
 
         plt.figure(figsize=(10, 6))
         plt.bar(df['date'].dt.strftime('%Y-%m-%d'), df['total_duration_hours'], color='darkblue', label='Per Day')
-        plt.axhline(y=total_sum_hours, color='red', linestyle='--', label='Total')
-        plt.title('Sum of duration per day with total')
+        # Mostre a hora no formato HH:MM
+        plt.title('Sum of duration per day with total. The total sum is {} h {} min'.format(get_hours, get_minutes))
         plt.xlabel('Date')
         plt.ylabel('Total duration (hours)')
         plt.xticks(rotation=45)
