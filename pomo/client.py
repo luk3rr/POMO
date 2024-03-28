@@ -1,29 +1,20 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-# Filename: integration.py
-# Created on: March  2, 2024
+# Filename: client.py
+# Created on: March 28, 2024
 # Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
 
 import socket
 import json
 import time
 
-from pomo.config import SERVER_SOCKFILE, PACKET_SIZE
-
-
-# Recommended font: Noto Emoji
-TOMATO = ""
-BREAK = "󰅶"
-PAUSE = "󱦠"
-ICON_COLOR = "%{F#555}"
-RESET_COLOR = "%{F-}"
+from .config import SERVER_SOCKFILE, PACKET_SIZE
 
 RECONNECT_TIME = 5  # seconds
 
-
-class Integration:
+class Client:
     """
-    Integration class to get the status to the socket
+    Client class to get the status to the socket
     """
 
     def __init__(self):
@@ -85,9 +76,4 @@ class Integration:
 
         data = json.loads(packet)
 
-        status = TOMATO if data["status"] == "work" else BREAK
-
-        if not data["active"]:
-            status = PAUSE
-
-        return f"{ICON_COLOR}{status}{RESET_COLOR}  {data['timer']}\n"
+        return data

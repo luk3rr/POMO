@@ -22,7 +22,7 @@ A instância que executa em background também pode ser inicializa definindo alg
 OBS.: A duração de worktime e breaktime são dadas e segundos.
 
 #+begin_src sh
-$ python3 -m pomo --worktime 2700 --breaktime 300 --saveto ~/Documents/pomo.db
+$ python3 -m pomo --worktime 2700 --breaktime 300 --database ~/Documents/pomo.db
 #+end_src
 
 A partir desse momento, o gerenciamento do temporizador pode ser realizado, iniciando /worktimes/ ou /breaktimes/, ou pausando o relógio:
