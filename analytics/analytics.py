@@ -116,19 +116,28 @@ class Analytics:
         sum_per_day = self.query_sum_per_day(start, end)
 
         df = pd.DataFrame(sum_per_day, columns=["date", "total_duration"])
-        df['date'] = pd.to_datetime(df['date'])
-        df['total_duration_hours'] = df['total_duration'] / HOUR_FACTOR
+        df["date"] = pd.to_datetime(df["date"])
+        df["total_duration_hours"] = df["total_duration"] / HOUR_FACTOR
 
         # total_sum_hours = total_sum[0][0] / HOUR_FACTOR if total_sum[0][0] else 0
 
         get_hours, get_minutes = self.seconds_to_hours_minutes(total_sum[0][0])
 
         plt.figure(figsize=(10, 6))
-        plt.bar(df['date'].dt.strftime('%Y-%m-%d'), df['total_duration_hours'], color='darkblue', label='Per Day')
+        plt.bar(
+            df["date"].dt.strftime("%Y-%m-%d"),
+            df["total_duration_hours"],
+            color="darkblue",
+            label="Per Day",
+        )
         # Mostre a hora no formato HH:MM
-        plt.title('Sum of duration per day with total. The total sum is {} h {} min'.format(get_hours, get_minutes))
-        plt.xlabel('Date')
-        plt.ylabel('Total duration (hours)')
+        plt.title(
+            "Sum of duration per day with total. The total sum is {} h {} min".format(
+                get_hours, get_minutes
+            )
+        )
+        plt.xlabel("Date")
+        plt.ylabel("Total duration (hours)")
         plt.xticks(rotation=45)
         plt.legend()
         plt.tight_layout()
@@ -138,13 +147,13 @@ class Analytics:
         sum_per_tag = self.query_sum_per_tag(start, end)
 
         df = pd.DataFrame(sum_per_tag, columns=["tag", "total_duration"])
-        df['total_duration_hours'] = df['total_duration'] / HOUR_FACTOR
+        df["total_duration_hours"] = df["total_duration"] / HOUR_FACTOR
 
         plt.figure(figsize=(10, 6))
-        plt.bar(df['tag'], df['total_duration_hours'], color='darkblue')
-        plt.title(f'Sum of duration per tag considering the period {start} to {end}')
-        plt.xlabel('Tag')
-        plt.ylabel('Total duration (hours)')
+        plt.bar(df["tag"], df["total_duration_hours"], color="darkblue")
+        plt.title(f"Sum of duration per tag considering the period {start} to {end}")
+        plt.xlabel("Tag")
+        plt.ylabel("Total duration (hours)")
         plt.xticks(rotation=45)
         plt.tight_layout()
         plt.show()

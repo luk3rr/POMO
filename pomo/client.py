@@ -12,6 +12,7 @@ from .config import SERVER_SOCKFILE, PACKET_SIZE
 
 RECONNECT_TIME = 5  # seconds
 
+
 class Client:
     """
     Client class to get the status to the socket

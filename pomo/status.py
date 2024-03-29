@@ -9,8 +9,9 @@ import operator
 import subprocess
 
 from .timer import Timer
-from .config import TOMATO_ICON
+from .config import ICON
 from .log_manager import LogManager
+
 
 class Status:
     """
@@ -22,7 +23,7 @@ class Status:
         self.breaktime = breaktime
         self.status = "work"  # or "break"
         self.tag = tag
-        self.active = False # Pause or running
+        self.active = False  # Pause or running
         self.timer = Timer(self.worktime, self.tag, self.status)
         self.locked = True
         self.log_manager = LogManager()
@@ -109,18 +110,21 @@ class Status:
         self.log_manager.log(f"Updated tag from {old_tag} to {self.tag}")
 
         try:
-            subprocess.call(["notify-send",
-                                "-t",
-                                "5000",
-                                "-u",
-                                "normal",
-                                "-i",
-                                TOMATO_ICON,
-                                "Pomodoro",
-                                f"Updated tag to '{self.tag}'"],
-                                stdout=subprocess.DEVNULL,
-                                stderr=subprocess.DEVNULL,
-                            )
+            subprocess.call(
+                [
+                    "notify-send",
+                    "-t",
+                    "5000",
+                    "-u",
+                    "normal",
+                    "-i",
+                    ICON.TOMATO,
+                    "Pomodoro",
+                    f"Updated tag to '{self.tag}'",
+                ],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
         except FileNotFoundError:
             # Skip if notify-send isn't installed
             pass
@@ -137,15 +141,19 @@ class Status:
         Check if the system is in suspend
         """
         try:
-            result = subprocess.run(["systemctl",
-                                     "is-active",
-                                     "sleep.target",
-                                     "suspend.target",
-                                     "hibernate.target"],
-                                    capture_output=True,
-                                    text=True).stdout.split('\n')
+            result = subprocess.run(
+                [
+                    "systemctl",
+                    "is-active",
+                    "sleep.target",
+                    "suspend.target",
+                    "hibernate.target",
+                ],
+                capture_output=True,
+                text=True,
+            ).stdout.split("\n")
 
-            return 'active' in result
+            return "active" in result
 
         except subprocess.CalledProcessError:
             return False

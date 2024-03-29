@@ -18,31 +18,48 @@ DEFAULT_TAG = "other"
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Define the paths to the sound files
-BELL_SOUND = os.path.join(SCRIPT_DIR, "../data/sounds/bell.ogg")
-TIMER_SOUND = os.path.join(SCRIPT_DIR, "../data/sounds/timer.ogg")
-
-# Notification icon
-TOMATO_ICON = os.path.join(SCRIPT_DIR, "../data/img/tomato.png")
-MOON_ICON = os.path.join(SCRIPT_DIR, "../data/img/moon.png")
-SUN_ICON = os.path.join(SCRIPT_DIR, "../data/img/sun.png")
-PAUSE_ICON_DARK = os.path.join(SCRIPT_DIR, "../data/img/pause_dark.png")
-PAUSE_ICON_LIGHT = os.path.join(SCRIPT_DIR, "../data/img/pause_light.png")
-PLAY_ICON_DARK = os.path.join(SCRIPT_DIR, "../data/img/play_dark.png")
-PLAY_ICON_LIGHT = os.path.join(SCRIPT_DIR, "../data/img/play_light.png")
-SKIP_ICON_DARK = os.path.join(SCRIPT_DIR, "../data/img/skip_dark.png")
-SKIP_ICON_LIGHT = os.path.join(SCRIPT_DIR, "../data/img/skip_light.png")
-
 # Define the sound player
 PLAYER = "paplay"
 
 DAY_FACTOR = 86400
 HOUR_FACTOR = 3600
 MINUTE_FACTOR = 60
-GMT_OFFSET = -3 # Greenwich Mean Time
+GMT_OFFSET = -3  # Greenwich Mean Time
 
 DEFAULT_WORKTIME = 40 * MINUTE_FACTOR
 DEFAULT_BREAKTIME = 10 * MINUTE_FACTOR
 
 PACKET_SIZE = 1024
 SOCKET_TIMEOUT = 1e-6
+
+class SOUND:
+    """
+    Class to store the sounds
+    """
+    BELL = os.path.join(SCRIPT_DIR, "../data/sounds/bell.ogg")
+    TIMER = os.path.join(SCRIPT_DIR, "../data/sounds/timer.ogg")
+
+class COLOR:
+    """
+    Class to store the colors
+    """
+    BLACK = "#000000"
+    WHITE = "#FFFFFF"
+    GRAY = "#454545"
+    RED = "#FF6347"
+    GREEN = "#4CAF50"
+    BLUE = "#009bff"
+
+class ICON:
+    """
+    Class to store the icons
+    """
+    TOMATO = os.path.join(SCRIPT_DIR, "../data/img/tomato.png")
+    MOON = os.path.join(SCRIPT_DIR, "../data/img/moon.png")
+    SUN = os.path.join(SCRIPT_DIR, "../data/img/sun.png")
+    PAUSE_DARK = os.path.join(SCRIPT_DIR, "../data/img/pause_dark.png")
+    PAUSE_LIGHT = os.path.join(SCRIPT_DIR, "../data/img/pause_light.png")
+    PLAY_DARK = os.path.join(SCRIPT_DIR, "../data/img/play_dark.png")
+    PLAY_LIGHT = os.path.join(SCRIPT_DIR, "../data/img/play_light.png")
+    SKIP_DARK = os.path.join(SCRIPT_DIR, "../data/img/skip_dark.png")
+    SKIP_LIGHT = os.path.join(SCRIPT_DIR, "../data/img/skip_light.png")

@@ -13,17 +13,8 @@ from tkinter import ttk
 from PIL import Image, ImageTk
 
 from pomo.client import Client
-from pomo.config import (MOON_ICON, SUN_ICON,
-                         PAUSE_ICON_DARK, PAUSE_ICON_LIGHT,
-                         PLAY_ICON_DARK, PLAY_ICON_LIGHT,
-                         SKIP_ICON_DARK, SKIP_ICON_LIGHT)
+from pomo.config import COLOR, ICON
 
-BLACK = "#000000"
-WHITE = "#FFFFFF"
-GRAY = "#454545"
-RED = "#FF6347"
-GREEN = "#4CAF50"
-BLUE = "#009bff"
 
 class PomodoroGUI:
     def __init__(self, master):
@@ -55,11 +46,13 @@ class PomodoroGUI:
         """
         Create the status icon
         """
-        self.status_icon = tk.Label(self.master,
-                            text="Pause",
-                            fg=RED,
-                            bg=self.color_window_bg,
-                            font=("Helvetica", 24))
+        self.status_icon = tk.Label(
+            self.master,
+            text="Pause",
+            fg=COLOR.RED,
+            bg=self.color_window_bg,
+            font=("Helvetica", 24),
+        )
 
         self.status_icon.pack(pady=10)
 
@@ -67,19 +60,21 @@ class PomodoroGUI:
         """
         Create the pause button
         """
-        if self.color_window_bg == BLACK:
-            image_path = PAUSE_ICON_LIGHT
+        if self.color_window_bg == COLOR.BLACK:
+            image_path = ICON.PAUSE_LIGHT
         else:
-            image_path = PAUSE_ICON_DARK
+            image_path = ICON.PAUSE_DARK
 
         self.pause_button_image = Image.open(image_path)
         self.pause_button_image = self.pause_button_image.resize((30, 30))
         self.pause_button_image = ImageTk.PhotoImage(self.pause_button_image)
 
-        self.pause_button = ttk.Button(self.master,
-                                       image=self.pause_button_image,
-                                       command=self.toggle_timer,
-                                       style='Pomodoro.TButton')
+        self.pause_button = ttk.Button(
+            self.master,
+            image=self.pause_button_image,
+            command=self.toggle_timer,
+            style="Pomodoro.TButton",
+        )
 
         self.pause_button.pack(pady=5)
 
@@ -87,40 +82,44 @@ class PomodoroGUI:
         """
         Update the pause button
         """
-        if self.color_window_bg == BLACK:
+        if self.color_window_bg == COLOR.BLACK:
             if self.status == "Pause":
-                image_path = PLAY_ICON_LIGHT
+                image_path = ICON.PLAY_LIGHT
             else:
-                image_path = PAUSE_ICON_LIGHT
+                image_path = ICON.PAUSE_LIGHT
         else:
             if self.status == "Pause":
-                image_path = PLAY_ICON_DARK
+                image_path = ICON.PLAY_DARK
             else:
-                image_path = PAUSE_ICON_DARK
+                image_path = ICON.PAUSE_DARK
 
         self.pause_button_image = Image.open(image_path)
         self.pause_button_image = self.pause_button_image.resize((30, 30))
         self.pause_button_image = ImageTk.PhotoImage(self.pause_button_image)
 
-        self.pause_button.configure(image=self.pause_button_image, style='Pomodoro.TButton')
+        self.pause_button.configure(
+            image=self.pause_button_image, style="Pomodoro.TButton"
+        )
 
     def create_skip_button(self):
         """
         Create the skip button
         """
-        if self.color_window_bg == BLACK:
-            image_path = SKIP_ICON_LIGHT
+        if self.color_window_bg == COLOR.BLACK:
+            image_path = ICON.SKIP_LIGHT
         else:
-            image_path = SKIP_ICON_DARK
+            image_path = ICON.SKIP_DARK
 
         self.skip_button_image = Image.open(image_path)
         self.skip_button_image = self.skip_button_image.resize((30, 30))
         self.skip_button_image = ImageTk.PhotoImage(self.skip_button_image)
 
-        self.skip_button = ttk.Button(self.master,
-                                       image=self.skip_button_image,
-                                       command=self.next_timer,
-                                       style='Pomodoro.TButton')
+        self.skip_button = ttk.Button(
+            self.master,
+            image=self.skip_button_image,
+            command=self.next_timer,
+            style="Pomodoro.TButton",
+        )
 
         self.skip_button.pack(pady=5)
 
@@ -128,41 +127,49 @@ class PomodoroGUI:
         """
         Update the skip button
         """
-        if self.color_window_bg == BLACK:
-            image_path = SKIP_ICON_LIGHT
+        if self.color_window_bg == COLOR.BLACK:
+            image_path = ICON.SKIP_LIGHT
         else:
-            image_path = SKIP_ICON_DARK
+            image_path = ICON.SKIP_DARK
 
         self.skip_button_image = Image.open(image_path)
         self.skip_button_image = self.skip_button_image.resize((30, 30))
         self.skip_button_image = ImageTk.PhotoImage(self.skip_button_image)
 
-        self.skip_button.configure(image=self.skip_button_image, style='Pomodoro.TButton')
+        self.skip_button.configure(
+            image=self.skip_button_image, style="Pomodoro.TButton"
+        )
 
     def create_clock_label(self):
         """
         Create the clock label
         """
-        self.canvas = tk.Canvas(self.master,
-                                width=200,
-                                height=200,
-                                bg=self.color_window_bg,
-                                highlightthickness=0)
+        self.canvas = tk.Canvas(
+            self.master,
+            width=200,
+            height=200,
+            bg=self.color_window_bg,
+            highlightthickness=0,
+        )
         self.canvas.pack()
 
-        self.clock_label = tk.Label(self.canvas,
-                                    text="00:00",
-                                    fg=self.color_clock_timer,
-                                    bg=self.color_window_bg,
-                                    font=("Helvetica", 36))
+        self.clock_label = tk.Label(
+            self.canvas,
+            text="00:00",
+            fg=self.color_clock_timer,
+            bg=self.color_window_bg,
+            font=("Helvetica", 36),
+        )
 
         self.canvas.create_window(100, 100, window=self.clock_label)
 
-        self.timer_tag = tk.Label(self.canvas,
-                                  text="",
-                                  fg=self.color_timer_tag,
-                                  bg=self.color_window_bg,
-                                  font=("Helvetica", 12))
+        self.timer_tag = tk.Label(
+            self.canvas,
+            text="",
+            fg=self.color_timer_tag,
+            bg=self.color_window_bg,
+            font=("Helvetica", 12),
+        )
 
         self.canvas.create_window(100, 135, window=self.timer_tag)
 
@@ -170,19 +177,21 @@ class PomodoroGUI:
         """
         Create the mode button
         """
-        if self.color_window_bg == BLACK:
-            image_path = SUN_ICON
+        if self.color_window_bg == COLOR.BLACK:
+            image_path = ICON.SUN
         else:
-            image_path = MOON_ICON
+            image_path = ICON.MOON
 
         self.mode_button_image = Image.open(image_path)
         self.mode_button_image = self.mode_button_image.resize((30, 30))
         self.mode_button_image = ImageTk.PhotoImage(self.mode_button_image)
 
-        self.mode_button = ttk.Button(self.master,
-                                      image=self.mode_button_image,
-                                      command=self.toggle_mode,
-                                      style='Pomodoro.TButton')
+        self.mode_button = ttk.Button(
+            self.master,
+            image=self.mode_button_image,
+            command=self.toggle_mode,
+            style="Pomodoro.TButton",
+        )
 
         self.mode_button.pack(pady=5)
 
@@ -190,27 +199,29 @@ class PomodoroGUI:
         """
         Update the mode button
         """
-        if self.color_window_bg == BLACK:
-            image_path = SUN_ICON
+        if self.color_window_bg == COLOR.BLACK:
+            image_path = ICON.SUN
         else:
-            image_path = MOON_ICON
+            image_path = ICON.MOON
 
         self.mode_button_image = Image.open(image_path)
         self.mode_button_image = self.mode_button_image.resize((30, 30))
         self.mode_button_image = ImageTk.PhotoImage(self.mode_button_image)
 
-        self.mode_button.configure(image=self.mode_button_image, style='Pomodoro.TButton')
+        self.mode_button.configure(
+            image=self.mode_button_image, style="Pomodoro.TButton"
+        )
 
     def toggle_mode(self):
         """
         Toggle between light and dark mode
         """
-        if self.color_window_bg == BLACK:
+        if self.color_window_bg == COLOR.BLACK:
             self.mode_light()
         else:
             self.mode_dark()
 
-        # Atualizar cores dos elementos
+        # Update colors of the elements
         self.master.configure(bg=self.color_window_bg)
         self.status_icon.config(bg=self.color_window_bg)
         self.clock_label.config(fg=self.color_clock_timer, bg=self.color_window_bg)
@@ -228,35 +239,37 @@ class PomodoroGUI:
         Setup the styles for the buttons
         """
         style = ttk.Style()
-        style.configure('Pomodoro.TButton',
-                        background=self.color_window_bg,
-                        foreground=self.color_button_fg,
-                        borderwidth=0,
-                        highlightthickness=0)
+        style.configure(
+            "Pomodoro.TButton",
+            background=self.color_window_bg,
+            foreground=self.color_button_fg,
+            borderwidth=0,
+            highlightthickness=0,
+        )
 
     def mode_dark(self):
         """
         Define the colors for dark mode
         """
-        self.color_window_bg = BLACK
-        self.color_button_bg = RED
-        self.color_button_fg = WHITE
-        self.color_clock_timer = WHITE
-        self.color_timer_tag = WHITE
+        self.color_window_bg = COLOR.BLACK
+        self.color_button_bg = COLOR.RED
+        self.color_button_fg = COLOR.WHITE
+        self.color_clock_timer = COLOR.WHITE
+        self.color_timer_tag = COLOR.WHITE
         self.color_arc_bg = "lightgrey"
-        self.color_arc = RED
+        self.color_arc = COLOR.RED
 
     def mode_light(self):
         """
         Define the colors for light mode
         """
-        self.color_window_bg = WHITE
-        self.color_button_bg = GREEN
-        self.color_button_fg = BLACK
-        self.color_clock_timer = BLACK
-        self.color_timer_tag = BLACK
+        self.color_window_bg = COLOR.WHITE
+        self.color_button_bg = COLOR.GREEN
+        self.color_button_fg = COLOR.BLACK
+        self.color_clock_timer = COLOR.BLACK
+        self.color_timer_tag = COLOR.BLACK
         self.color_arc_bg = "lightgrey"
-        self.color_arc = BLUE
+        self.color_arc = COLOR.BLUE
 
     def update_progress_circle(self, time_remaining, total_time):
         """
@@ -271,26 +284,30 @@ class PomodoroGUI:
 
         progress_percentage = 1 - time_remaining / total_time
 
-        self.canvas.create_oval(center_x - radius,
-                                center_y - radius,
-                                center_x + radius,
-                                center_y + radius,
-                                outline=self.color_arc_bg,
-                                width=10)
+        self.canvas.create_oval(
+            center_x - radius,
+            center_y - radius,
+            center_x + radius,
+            center_y + radius,
+            outline=self.color_arc_bg,
+            width=10,
+        )
 
         start_angle = 90
-        extent = - 360 * progress_percentage
+        extent = -360 * progress_percentage
 
-        self.canvas.create_arc(center_x - radius,
-                               center_y - radius,
-                               center_x + radius,
-                               center_y + radius,
-                               start=start_angle,
-                               extent=extent,
-                               style=tk.ARC,
-                               outline=self.color_arc,
-                               width=10,
-                               tags="progress_circle")
+        self.canvas.create_arc(
+            center_x - radius,
+            center_y - radius,
+            center_x + radius,
+            center_y + radius,
+            start=start_angle,
+            extent=extent,
+            style=tk.ARC,
+            outline=self.color_arc,
+            width=10,
+            tags="progress_circle",
+        )
 
     def display(self):
         """
@@ -320,7 +337,7 @@ class PomodoroGUI:
             self.timer_tag.config(text=f"{data['tag']}")
             self.status_icon.config(text=self.status)
 
-            self.update_progress_circle(data['remaining'], data['total_time'])
+            self.update_progress_circle(data["remaining"], data["total_time"])
 
         except socket.timeout:
             self.client.reconnect()
@@ -348,8 +365,3 @@ class PomodoroGUI:
             subprocess.run(["python3", "-m", "pomo", "end"])
         except Exception as e:
             print("Error occurred while executing the command:", e)
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    pomodoro_gui = PomodoroGUI(root)
-    root.mainloop()

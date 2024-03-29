@@ -13,10 +13,9 @@ from .config import (
     DAY_FACTOR,
     HOUR_FACTOR,
     MINUTE_FACTOR,
-    BELL_SOUND,
-    TIMER_SOUND,
     PLAYER,
-    TOMATO_ICON,
+    ICON,
+    SOUND,
 )
 
 
@@ -86,7 +85,7 @@ class Timer:
         self.time -= delta
 
         if self.time < 4 and not self.sound_played:
-            self.play_sound(TIMER_SOUND)
+            self.play_sound(SOUND.TIMER)
             self.sound_played = True
 
         # Send a notification when timer reaches 0
@@ -101,7 +100,7 @@ class Timer:
                         "-u",
                         "critical",
                         "-i",
-                        TOMATO_ICON,
+                        ICON.TOMATO,
                         "Pomodoro",
                         "Timer reached zero",
                     ],
@@ -109,7 +108,7 @@ class Timer:
                     stderr=DEVNULL,
                 )
 
-                self.play_sound(BELL_SOUND)
+                self.play_sound(SOUND.BELL)
             except FileNotFoundError:
                 # Skip if notify-send isn't installed
                 pass
@@ -126,7 +125,7 @@ class Timer:
                         "-u",
                         "normal",
                         "-i",
-                        TOMATO_ICON,
+                        ICON.TOMATO,
                         "Pomodoro",
                         f"Starting timer with tag '{self.tag}'",
                     ],

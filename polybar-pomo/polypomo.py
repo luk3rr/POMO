@@ -16,9 +16,9 @@ PAUSE = "󱦠"
 ICON_COLOR = "%{F#555}"
 RESET_COLOR = "%{F-}"
 
+
 class PolyPomo:
-    """
-    """
+    """ """
 
     def __init__(self):
         self.client = Client()
@@ -32,10 +32,8 @@ class PolyPomo:
     def __exit__(self, exc_type, exc_value, traceback):
         self.client.close_connection()
 
-
     def display(self):
-        """
-        """
+        """ """
 
         try:
             data = self.client.get_status()

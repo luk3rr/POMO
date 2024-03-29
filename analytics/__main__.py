@@ -8,6 +8,7 @@ import sys
 from datetime import datetime, timedelta
 from .analytics import Analytics
 
+
 def get_date_range(current_date, days_before):
     """
     Get the date range
@@ -21,10 +22,11 @@ def get_date_range(current_date, days_before):
 def main():
     if len(sys.argv) != 2 and len(sys.argv) != 3:
         print("Usage: python3 -m analytics <start_date> <end_date>")
-        print("Usage: python3 -m analytics <n days before> # to get the range from n days before to today")
+        print(
+            "Usage: python3 -m analytics <n days before> # to get the range from n days before to today"
+        )
         print("Date format: YYYY-MM-DD")
         sys.exit(1)
-
 
     if len(sys.argv) == 2:
         days_before = int(sys.argv[1])
@@ -41,6 +43,7 @@ def main():
     analytics = Analytics()
 
     analytics.performance_between_dates(start_date, end_date)
+
 
 if __name__ == "__main__":
     main()

@@ -8,10 +8,12 @@ import datetime
 
 from .config import LOGFILE
 
+
 class LogManager:
     """
     Log manager class
     """
+
     def __init__(self):
         pass
 

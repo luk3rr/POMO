@@ -9,6 +9,7 @@ import time
 
 from .polypomo import PolyPomo
 
+
 def main():
     """
     Main function
@@ -29,6 +30,7 @@ def main():
                 sys.stderr.write(f"Fatal error: {e}\n")
                 sys.stderr.flush()
                 sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

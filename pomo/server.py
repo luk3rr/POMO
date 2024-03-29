@@ -13,6 +13,7 @@ from time import sleep
 from .config import SERVER_SOCKFILE
 from .log_manager import LogManager
 
+
 class Server:
     """
     Server class to handle the server socket
@@ -42,7 +43,7 @@ class Server:
             os.remove(SERVER_SOCKFILE)
 
         except FileNotFoundError:
-             pass
+            pass
 
         # Add server socket
         try:
@@ -57,7 +58,10 @@ class Server:
                 self.log_manager.log(f"Server socket created")
 
                 self.total_clients += 1
-                thread = threading.Thread(target=self.handle_client, args=(client_socket, client_addr, self.total_clients))
+                thread = threading.Thread(
+                    target=self.handle_client,
+                    args=(client_socket, client_addr, self.total_clients),
+                )
                 thread.start()
 
         except Exception as e:
@@ -77,9 +81,17 @@ class Server:
                     "status": self.status.status,
                     "timer": self.status.timer.format_time(),
                     "active": self.status.active,
-                    "remaining": self.status.worktime - self.status.timer.get_elapsed() if self.status.status == "work" else self.status.breaktime - self.status.timer.get_elapsed(),
+                    "remaining": (
+                        self.status.worktime - self.status.timer.get_elapsed()
+                        if self.status.status == "work"
+                        else self.status.breaktime - self.status.timer.get_elapsed()
+                    ),
                     "tag": self.status.tag,
-                    "total_time": self.status.worktime if self.status.status == "work" else self.status.breaktime,
+                    "total_time": (
+                        self.status.worktime
+                        if self.status.status == "work"
+                        else self.status.breaktime
+                    ),
                 }
 
                 packet = json.dumps(status_data)
