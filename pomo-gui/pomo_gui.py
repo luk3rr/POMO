@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Filename: gui.py
+# Filename: pomo_gui.py
 # Created on: March 28, 2024
 # Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
 
@@ -17,12 +17,29 @@ from pomo.config import COLOR, ICON
 
 
 class PomodoroGUI:
-    def __init__(self, master):
+    def __init__(self, master, run_as_client=False):
         self.master = master
-        self.client = Client()
+
+        if run_as_client:
+            self.client = Client()
+        else:
+            self.start_pomo_server()
+            self.client = Client()
+
         self.status = "Pause"
         self.draw_gui()
         self.display()
+
+    def __del__(self):
+        if self.process_child:
+            # Terminates the process
+            self.process_child.terminate()
+
+    def start_pomo_server(self):
+        """
+        Start the pomodoro server as child process
+        """
+        self.process_child = subprocess.Popen(["python3", "-m", "pomo"])
 
     def draw_gui(self):
         """

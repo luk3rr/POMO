@@ -243,3 +243,5 @@ class Pomodoro:
                 keyboard_msg = "Keyboard interrupt received, exiting..."
                 self.log_manager.log(keyboard_msg)
                 print(keyboard_msg)
+
+        self.server_thread.join()
