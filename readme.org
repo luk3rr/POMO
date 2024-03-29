@@ -1,58 +1,134 @@
+#+begin_src txt
+______/\\\\\\\\\\\\\__________/\\\\\________/\\\\____________/\\\\________/\\\\\______
+ _____\/\\\/////////\\\______/\\\///\\\_____\/\\\\\\________/\\\\\\______/\\\///\\\____
+  _____\/\\\_______\/\\\____/\\\/__\///\\\___\/\\\//\\\____/\\\//\\\____/\\\/__\///\\\__
+   _____\/\\\\\\\\\\\\\/____/\\\______\//\\\__\/\\\\///\\\/\\\/_\/\\\___/\\\______\//\\\_
+    _____\/\\\/////////_____\/\\\_______\/\\\__\/\\\__\///\\\/___\/\\\__\/\\\_______\/\\\_
+     _____\/\\\______________\//\\\______/\\\___\/\\\____\///_____\/\\\__\//\\\______/\\\__
+      _____\/\\\_______________\///\\\__/\\\_____\/\\\_____________\/\\\___\///\\\__/\\\____
+       _____\/\\\_________________\///\\\\\/______\/\\\_____________\/\\\_____\///\\\\\/_____
+        _____\///____________________\/////________\///______________\///________\/////_______
+#+end_src
 * POMO
-O Pomo é um temporizador desenvolvido com o objetivo de oferecer uma maneira simples de aplicar a técnica [[https://en.wikipedia.org/wiki/Pomodoro_Technique][Pomodoro]], uma técnica de gerenciamento de tempo popular. Além disso, o projeto possibilita a integração do temporizador com outros programas, transmitindo dados por meio de sockets. O Pomo também inclui um módulo específico para análise de dados, proporcionando uma visão mais aprofundada do uso do temporizador.
+O POMO é um temporizador desenvolvido com o objetivo de oferecer uma maneira simples de aplicar a técnica [[https://en.wikipedia.org/wiki/Pomodoro_Technique][Pomodoro]], uma estratégia de gerenciamento de tempo popular. Além disso, o projeto possibilita a integração do temporizador com outros programas, transmitindo dados por meio de sockets. O Pomo também inclui um módulo específico para análise de dados, proporcionando uma visão mais aprofundada do uso do temporizador.
 
-* Table of Contents
-+ [[#Usage][Usage]]
-+ [[#Architecture][Architecture]]
-  + [[#Modules][Modules]]
-* Usage
+* Sumário
++ [[#uso][Uso]]
+  + [[#gui---graphical-user-interface][GUI]]
+  + [[#cli---command-line-interface][CLI]]
++ [[#arquitetura][Arquitetura]]
+  + [[#mestre-e-escravo][Mestre e escravo]]
+  + [[#módulos][Módulos]]
+
+* Uso
+** GUI - Graphical User Interface
+*** Execução
+POMO fornece uma interface gráfica para usuários /noobs/. Para utilizá-la, você pode executar o comando
+#+begin_src sh
+$ python3 -m pomo-gui
+# OR
+$ python3 -m pomo-gui [parameters]
+#+end_src
+
+Os parâmetros disponíveis são:
+
+| Parâmetro                           | Descrição                                    |
+|-------------------------------------+----------------------------------------------|
+| =-h, --help=                        | Show help message and exit                   |
+| =-dm, --darkmode=                   | Run window in dark mode                      |
+| =-w, --worktime <time in seconds>=  | Set the worktime                             |
+| =-b, --breaktime <time in seconds>= | Set the breaktime                            |
+| =-db, --database <path>=            | Set the path to database                     |
+| =-t, --tag <tag>=                   | Set the tag to be used to identify the timer |
+
+Ao inicializar o =pomo-gui=, um processo do módulo [[https://github.com/luk3rr/POMO/tree/main/pomo][pomo]] será executado em background até que o =pomo-gui= seja finalizado.
+
+O módulo =pomo-gui= aceita também o parâmetro =-c, --client=, para o caso de já haver um processo do módulo =pomo= executando em background. Esse parâmetro impedirá que outro processo seja executado.
+
+*** Interação com a tela
+Em determinadas partes da interface, a interação pode ser feita através do mouse:
++ Click com o scroll do mouse no temporizador: Ativa ou desativa o bloqueio de incremento e decremento do timer
++ Scroll do mouse em cima do temporizador: Incrementa ou decrementa o timer, de acordo com a direção do acionamento do scroll
+
+Além disso, há os botões:
++ [[file:data/img/readme_pause_light.png]] [[file:data/img/readme_play_light.png]] : Pause/Resume
++ [[file:data/img/readme_skip_light.png]] : skip para finalizar o /breaktime/ ou /worktime/ atual e pular para o próximo modo
++ [[file:data/img/readme_sun.png]] [[file:data/img/readme_moon.png]] : alternar entre o modo claro e o modo escuro da janela
+
+As cores do modo escuro utilizam a paleta do tema [[https://github.com/dracula/dracula-theme][Dracula]].
+
+| Pomo-GUI em modo claro                | Pomo-GUI em modo escuro              |
+|---------------------------------------+--------------------------------------|
+| [[file:data/img/pomo-gui_light_mode.png]] | [[file:data/img/pomo-gui_dark_mode.png]] |
+
+Na imagem acima, a palavra =other= abaixo do temporizado é a tag definida para o timer atual. Essa tag pode ser atualizada com o serguinte comando:
+#+begin_src sh
+$ python3 -m pomo tag <new_tag>
+#+end_src
+
+Por fim, o ciclo em volta do relógio é preenchido à medida que o tempo configurado passa.
+
+** CLI - Command Line Interface
+*** Instância em background
+Como será exposto posteriormente, a arquitetura de POMO opera com mestres e escravo. Escravo é o processo que executará em background aguardando o envio de comandos dos mestres. Dessa forma, o primeiro passo é iniciar uma instância em background do módulo =pomo=.
+
 Crie uma instância de execução do módulo Pomo com o seguinte comando:
 #+begin_src sh
 $ python3 -m pomo
 #+end_src
 
-OBS.: Talvez seja interessante adicionar o projeto ao path do seu SO:
+A instância que executa em background também pode ser inicializa definindo alguns parâmetros. Execute =python3 -m pomo --help= para visualizar as opções disponíveis. Esse parâmetros também são configuráveis no arquivo =pomo/config.py=.
 
-#+begin_src sh
-$ export PATH=$PATH:/caminho/para/POMO
-#+end_src
-
-A instância que executa em background também pode ser inicializa definindo alguns parâmetros. Esse parâmetros também são configuráveis no arquivo =pomo/config.py=.
-
-OBS.: A duração de worktime e breaktime são dadas e segundos.
+OBS.: A duração de /worktime/ e /breaktime/ são dadas em segundos. Por exemplo:
 
 #+begin_src sh
 $ python3 -m pomo --worktime 2700 --breaktime 300 --database ~/Documents/pomo.db
 #+end_src
 
-A partir desse momento, o gerenciamento do temporizador pode ser realizado, iniciando /worktimes/ ou /breaktimes/, ou pausando o relógio:
+OBS.: Talvez seja interessante adicionar o projeto ao path do seu SO. Isso permitirá que você execute os comandos a partir de qualquer diretório. Para isso, você pode modificar o comando abaixo de forma que o caminho corresponda ao caminho onde esse projeto foi clonado:
+
+#+begin_src sh
+$ export PATH=$PATH:/caminho/para/POMO
+#+end_src
+
+*** Enviando comandos para a instância em background
+**** Pause, resume e skip
+Uma vez que existe uma instância módulo =pomo= rodando em background, o gerenciamento do temporizador pode ser realizado, iniciando /worktimes/ ou /breaktimes/, ou pausando o relógio:
 
 #+begin_src sh
 $ python3 -m pomo toggle # Pause ou ative o relógio
 #+end_src
 
-
 #+begin_src sh
 $ python3 -m pomo end # Finalize o worktime ou breaktime atual
 #+end_src
 
-O temporizador funciona em ciclos, ou seja, ao finalizar um worktime, inicializamos um breaktime, e ao finalizar um breaktime, um worktime é iniciado.
+O temporizador opera em ciclos, ou seja, ao finalizar um /worktime/, inicializamos um /breaktime/, e ao finalizar um /breaktime/, um /worktime/ é iniciado.
 
+**** Incremento e decremento do relógio
+O tempo do relógio pode ser incrementado ou decrementado. Por exemplo:
 #+begin_src sh
-$ python3 -m pomo time +60 # Incrementa o relógio em 60s
+$ python3 -m pomo time +60 # Incrementa o relógio em 1min
+$ python3 -m pomo time -120 # Decrementa o relógio em 2min
 #+end_src
 
-O comando acima adiciona 1min ao relógio. Também poderia ser utilizado o sinal de subtração para diminuir o tempo do relógio.
-
+O incremento e decremento do relógio pode ser ativado ou desativo utilizando o comando abaixo:
 #+begin_src sh
 $ python3 -m pomo lock # Alterna o bloqueio do incremento e decremento do relógio
 #+end_src
 
-* Architecture
+* Arquitetura
+** Mestre e escravo
+A arquitetura do POMO foi baseada em uma estratégia de mestre e escravo. O escravo é o processo do módulo =pomo= que executa em background. Esse processo fica encarregado de receber e executar os comandos enviados pelo mestre. O mestre, por outro lado, são execuções do módulo =pomo= acompanhadas de parâmetros que definem quais comandos serão executados. Ao contrário dos escravos, os mestres são efêmeros, isto é, não executam em background por muito tempo, e o tempo de execução de seus processos é somente o necessário para estabelecer comunicação com o escravo e transmitir os comandos.
+
+As comunicações entre mestre e escravo são feitas por meio de sockets UNIX. A figura abaixo ilustra a arquitetura. As setas representam os fluxos de comunicação entre os módulos.
+
 [[file:data/img/architecture.png]]
 
-** Modules
-*** Pomo
+O banco de dados é um arquivo =.db=, criado (caso não exista) em um diretório default ou onde o usuário determinar.
+
+** Módulos
+*** pomo
 Pomo é o módulo principal do programa. As principais classes desse módulo são:
 1. *DBManager*: Acessa e manipula o banco de dados
 2. *LogManager*: Gerencia as mensagens de log
@@ -60,7 +136,7 @@ Pomo é o módulo principal do programa. As principais classes desse módulo sã
 4. *Timer*: Relógio que contabiliza o tempo a cada instante
 5. *Pomodoro*: Executa todos os comandos enviados pelo usuário e fornece os dados do programa através de sockets.
 
-*** Polybar-pomo
+*** polybar-pomo
 Pomo pode ser integrado com o [[https://github.com/polybar/polybar][Polybar]]. Um exemplo de configuração:
 
 #+begin_src dosini
@@ -79,6 +155,9 @@ click-middle = python3 -m pomo lock
 scroll-up = python3 -m pomo time +60
 scroll-down = python3 -m pomo time -60
 #+end_src
+
+*** pomo-gui
+Fornece uma interface gráfica para gerenciar o módulo Pomo.
 
 *** Analytics
 A principal função desse módulo e fazer uma analise dos dados disponíveis no banco de dados, de forma que o usuário possa avaliar a sua performance com relação ao uso da técnica Pomodoro.

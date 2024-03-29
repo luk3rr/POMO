@@ -32,17 +32,21 @@ DEFAULT_BREAKTIME = 10 * MINUTE_FACTOR
 PACKET_SIZE = 1024
 SOCKET_TIMEOUT = 1e-6
 
+
 class SOUND:
     """
     Class to store the sounds
     """
+
     BELL = os.path.join(SCRIPT_DIR, "../data/sounds/bell.ogg")
     TIMER = os.path.join(SCRIPT_DIR, "../data/sounds/timer.ogg")
+
 
 class ICON:
     """
     Class to store the icons
     """
+
     TOMATO = os.path.join(SCRIPT_DIR, "../data/img/tomato.png")
     MOON = os.path.join(SCRIPT_DIR, "../data/img/moon.png")
     SUN = os.path.join(SCRIPT_DIR, "../data/img/sun.png")

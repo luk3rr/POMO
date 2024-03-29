@@ -38,6 +38,11 @@ class ARC:
 
 
 class DRACULA_THEME:
+    """
+    Class to store the Dracula theme colors
+    reference: https://draculatheme.com/contribute
+    """
+
     BACKGROUND = "#282A36"
     CURRENT_LINE = "#44475A"
     FOREGROUND = "#F8F8F2"
