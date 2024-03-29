@@ -68,6 +68,27 @@ $ python3 -m pomo tag <new_tag>
 
 Por fim, o ciclo em volta do relógio é preenchido à medida que o tempo configurado passa.
 
+*** Atalho na área de trabalho
+Em sistemas GNU/Linux, você pode criar um atalho para o =pomo-gui=, com o intuito de não precisar abrir o terminal para inicializar a aplicação. Para isso, crie um arquivo chamado =pomo.desktop= e grave o código abaixo nele (Não esqueça de corrigir o caminho de =Icon=)
+
+#+begin_src dosini
+[Desktop Entry]
+Name=Pomo
+Exec=python3 -m pomo-gui
+Icon=/caminho/para/POMO/data/img/tomato.png
+Type=Application
+Categories=Productivity;
+#+end_src
+
+Mova o arquivo =pomo.desktop= para o seguinte diretório =~/.local/share/applications/=.
+
+Por fim, abra o terminal e adicione o projeto ao path do seu SO (isso é necessário para que o comando =python3 -m pomo-gui= seja reconhecido sem a necessidade de determinar o caminho completo).
+#+begin_src sh
+$ export PATH=$PATH:/caminho/para/POMO
+#+end_src
+
+Após isso, o seu SO já deve ser capaz de localizar a aplicação através do launcher de aplicativos.
+
 ** CLI - Command Line Interface
 *** Instância em background
 Como será exposto posteriormente, a arquitetura de POMO opera com mestres e escravo. Escravo é o processo que executará em background aguardando o envio de comandos dos mestres. Dessa forma, o primeiro passo é iniciar uma instância em background do módulo =pomo=.
