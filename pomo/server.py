@@ -77,6 +77,9 @@ class Server:
                     "status": self.status.status,
                     "timer": self.status.timer.format_time(),
                     "active": self.status.active,
+                    "remaining": self.status.worktime - self.status.timer.get_elapsed() if self.status.status == "work" else self.status.breaktime - self.status.timer.get_elapsed(),
+                    "tag": self.status.tag,
+                    "total_time": self.status.worktime if self.status.status == "work" else self.status.breaktime,
                 }
 
                 packet = json.dumps(status_data)

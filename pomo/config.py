@@ -24,6 +24,14 @@ TIMER_SOUND = os.path.join(SCRIPT_DIR, "../data/sounds/timer.ogg")
 
 # Notification icon
 TOMATO_ICON = os.path.join(SCRIPT_DIR, "../data/img/tomato.png")
+MOON_ICON = os.path.join(SCRIPT_DIR, "../data/img/moon.png")
+SUN_ICON = os.path.join(SCRIPT_DIR, "../data/img/sun.png")
+PAUSE_ICON_DARK = os.path.join(SCRIPT_DIR, "../data/img/pause_dark.png")
+PAUSE_ICON_LIGHT = os.path.join(SCRIPT_DIR, "../data/img/pause_light.png")
+PLAY_ICON_DARK = os.path.join(SCRIPT_DIR, "../data/img/play_dark.png")
+PLAY_ICON_LIGHT = os.path.join(SCRIPT_DIR, "../data/img/play_light.png")
+SKIP_ICON_DARK = os.path.join(SCRIPT_DIR, "../data/img/skip_dark.png")
+SKIP_ICON_LIGHT = os.path.join(SCRIPT_DIR, "../data/img/skip_light.png")
 
 # Define the sound player
 PLAYER = "paplay"
