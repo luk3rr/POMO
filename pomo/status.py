@@ -4,17 +4,13 @@
 # Created on: March  2, 2024
 # Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
 
-import os
 import sys
 import operator
-import socket
-import json
 import subprocess
 
 from .timer import Timer
-from .config import SERVER_SOCKFILE, SOCKET_TIMEOUT, TOMATO_ICON
+from .config import TOMATO_ICON
 from .log_manager import LogManager
-
 
 class Status:
     """
@@ -29,62 +25,10 @@ class Status:
         self.active = False # Pause or running
         self.timer = Timer(self.worktime, self.tag, self.status)
         self.locked = True
-        self.server_socket = self.setup_socket()
-        self.existConnection = False
-        self.client_socket = None
-        self.client_addr = None
         self.log_manager = LogManager()
 
     def __del__(self):
-        self.server_socket.close()
-
-    def setup_socket(self):
-        """
-        Configure the server socket
-        """
-
-        try:
-            os.remove(SERVER_SOCKFILE)
-        except FileNotFoundError:
-            pass
-
-        # Add server socket
-        server_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        server_socket.bind(SERVER_SOCKFILE)
-        server_socket.listen(1)
-        return server_socket
-
-    def send_status(self):
-        """
-        Send the status to the socket
-        """
-
-        if not self.existConnection:
-            self.server_socket.settimeout(SOCKET_TIMEOUT)
-
-            try:
-                self.client_socket, self.client_addr = self.server_socket.accept()
-                self.existConnection = True
-
-            except socket.error:
-                pass
-        else:
-            status_data = {
-                "status": self.status,
-                "timer": self.timer.format_time(),
-                "active": self.active,
-            }
-
-            packet = json.dumps(status_data)
-
-            try:
-                if self.client_socket:
-                    self.client_socket.send(packet.encode())
-
-            except BrokenPipeError:
-                self.log_manager.log("Lost connection to client. Waiting for new connection...")
-                self.existConnection = False
-                self.server_socket = self.setup_socket()
+        pass
 
     def get_timer(self):
         """

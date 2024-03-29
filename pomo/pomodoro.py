@@ -8,6 +8,7 @@ import os
 import socket
 import time
 import select
+import threading
 
 from contextlib import contextmanager
 
@@ -20,6 +21,7 @@ from .utils import Exit
 from .log_manager import LogManager
 from .status import Status
 from .db_manager import DBManager
+from .server import Server
 
 
 class Pomodoro:
@@ -33,7 +35,6 @@ class Pomodoro:
         self.args = args
         self.log_manager = LogManager()
         self.db_manager = DBManager()
-
 
     @contextmanager
     def setup_listener(self):
@@ -215,12 +216,18 @@ class Pomodoro:
         print(run_msg)
         self.log_manager.log(run_msg)
 
+        # Run server
+        self.server = Server(self.status)
+        self.server_thread = threading.Thread(target=self.server.run)
+        self.server_thread.start()
+
         # Listen on socket
         with self.setup_listener() as sock:
             try:
                 while True:
                     self.status.update()
-                    self.status.send_status()
+                    # self.log_manager.log(f"timer: {self.status.get_timer()}")
+                    # self.status.send_status()
 
                     try:
                         self.check_actions(sock, self.status)
