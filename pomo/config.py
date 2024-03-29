@@ -39,17 +39,6 @@ class SOUND:
     BELL = os.path.join(SCRIPT_DIR, "../data/sounds/bell.ogg")
     TIMER = os.path.join(SCRIPT_DIR, "../data/sounds/timer.ogg")
 
-class COLOR:
-    """
-    Class to store the colors
-    """
-    BLACK = "#000000"
-    WHITE = "#FFFFFF"
-    GRAY = "#454545"
-    RED = "#FF6347"
-    GREEN = "#4CAF50"
-    BLUE = "#009bff"
-
 class ICON:
     """
     Class to store the icons
