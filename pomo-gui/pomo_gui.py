@@ -190,6 +190,31 @@ class PomodoroGUI:
 
         self.canvas.create_window(100, 135, window=self.timer_tag)
 
+        self.clock_label.bind("<Button-2>", self.middle_click_event)
+        self.clock_label.bind("<Enter>", self.clock_label.focus())
+        self.clock_label.bind("<Leave>", self.master.focus())
+        self.clock_label.bind("<Button-4>", self.scroll_event_pos)
+        self.clock_label.bind("<Button-5>", self.scroll_event_neg)
+
+    def scroll_event_pos(self, event):
+        """
+        Scroll event
+        """
+        self.increment_timer()
+
+    def scroll_event_neg(self, event):
+        """
+        Scroll event
+        """
+        self.decrement_timer()
+
+    def middle_click_event(self, event):
+        """
+        Middle click event
+        """
+        print("Middle click event")
+        self.toggle_lock()
+
     def create_mode_button(self):
         """
         Create the mode button
@@ -380,5 +405,35 @@ class PomodoroGUI:
         """
         try:
             subprocess.run(["python3", "-m", "pomo", "end"])
+        except Exception as e:
+            print("Error occurred while executing the command:", e)
+
+    def increment_timer(self):
+        """
+        Increment the timer
+        """
+        try:
+            subprocess.run(["python3", "-m", "pomo", "time", "+60"])
+
+        except Exception as e:
+            print("Error occurred while executing the command:", e)
+
+    def decrement_timer(self):
+        """
+        Decrement the timer
+        """
+        try:
+            subprocess.run(["python3", "-m", "pomo", "time", "-60"])
+
+        except Exception as e:
+            print("Error occurred while executing the command:", e)
+
+    def toggle_lock(self):
+        """
+        Toggle the lock
+        """
+        try:
+            subprocess.run(["python3", "-m", "pomo", "lock"])
+
         except Exception as e:
             print("Error occurred while executing the command:", e)
