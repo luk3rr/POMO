@@ -17,22 +17,26 @@ def parse_args():
         description="Pomodoro timer to be used with polybar"
     )
     parser.add_argument(
+        "-w",
         "--worktime",
         type=int,
         default=DEFAULT_WORKTIME,
         help="Default work timer time in seconds",
     )
     parser.add_argument(
+        "-b",
         "--breaktime",
         type=int,
         default=DEFAULT_BREAKTIME,
         help="Default break timer time in seconds",
     )
     parser.add_argument(
+        "-db",
         "--database", type=pathlib.Path, default=DB_FILE, help="Path to database"
     )
 
     parser.add_argument(
+        "-t",
         "--tag",
         type=str,
         default=DEFAULT_TAG,

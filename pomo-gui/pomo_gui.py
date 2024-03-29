@@ -17,10 +17,11 @@ from pomo.config import COLOR, ICON
 
 
 class PomodoroGUI:
-    def __init__(self, master, run_as_client=False):
+    def __init__(self, master, args):
         self.master = master
+        self.args = args
 
-        if run_as_client:
+        if args.client:
             self.client = Client()
         else:
             self.start_pomo_server()
@@ -31,7 +32,7 @@ class PomodoroGUI:
         self.display()
 
     def __del__(self):
-        if self.process_child:
+        if not self.args.client and self.process_child:
             # Terminates the process
             self.process_child.terminate()
 
@@ -39,7 +40,22 @@ class PomodoroGUI:
         """
         Start the pomodoro server as child process
         """
-        self.process_child = subprocess.Popen(["python3", "-m", "pomo"])
+
+        self.process_child = subprocess.Popen(
+            [
+                "python3",
+                "-m",
+                "pomo",
+                "--worktime",
+                str(self.args.worktime),
+                "--breaktime",
+                str(self.args.breaktime),
+                "--database",
+                str(self.args.database),
+                "--tag",
+                str(self.args.tag),
+            ]
+        )
 
     def draw_gui(self):
         """
@@ -48,7 +64,12 @@ class PomodoroGUI:
         self.master.title("Pomodoro Timer")
         self.master.geometry("300x420")
 
-        self.mode_light()
+        if self.args.darkmode:
+            self.mode_dark()
+
+        else:
+            self.mode_light()
+
         self.setup_styles()
 
         self.master.configure(bg=self.color_window_bg)
@@ -190,6 +211,7 @@ class PomodoroGUI:
 
         self.canvas.create_window(100, 135, window=self.timer_tag)
 
+        # Mouse events
         self.clock_label.bind("<Button-2>", self.middle_click_event)
         self.clock_label.bind("<Enter>", self.clock_label.focus())
         self.clock_label.bind("<Leave>", self.master.focus())
@@ -212,7 +234,6 @@ class PomodoroGUI:
         """
         Middle click event
         """
-        print("Middle click event")
         self.toggle_lock()
 
     def create_mode_button(self):
