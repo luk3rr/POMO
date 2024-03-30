@@ -58,7 +58,9 @@ class DBManager:
                         f.write("")
 
                 except FileNotFoundError:
-                    self.log_manager.log(f"Error creating database {path}. File not found.")
+                    self.log_manager.log(
+                        f"Error creating database {path}. File not found."
+                    )
                     exit(1)
             else:
                 exit(1)

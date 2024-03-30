@@ -6,6 +6,7 @@
 
 import datetime
 import inspect
+import re
 
 from .config import LOGFILE
 
@@ -23,10 +24,22 @@ class LogManager:
     def __del__(self):
         pass
 
+    def sanitize_message(self, text):
+        """
+        Sanitize the message
+        """
+
+        text = text.replace("\n", " ")  # Remove newlines
+        text = re.sub(r"\s+", " ", text)  # Remove multiple spaces
+
+        return text
+
     def log(self, text):
         """
         Register a message in the log file
         """
+
+        text = self.sanitize_message(text)
 
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
