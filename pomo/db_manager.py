@@ -24,6 +24,22 @@ class DBManager:
     def __del__(self):
         pass
 
+    def ensure_dir(self, file_path):
+        """
+        Ensure the directory of the file exists
+        """
+        directory = os.path.dirname(file_path)
+        if not os.path.exists(directory):
+            try:
+                os.makedirs(directory)
+                self.log_manager.log(f"Created directory {directory}")
+
+            except OSError:
+                self.log_manager.log(f"Error creating directory {directory}")
+                return False
+
+        return True
+
     @contextmanager
     def setup_connection(self, path):
         """
@@ -35,8 +51,17 @@ class DBManager:
 
         if not os.path.isfile(path):
             self.log_manager.log(f"Database {path} does not exist, creating it...")
-            with open(path, "w") as f:
-                f.write("")
+
+            if self.ensure_dir(path):
+                try:
+                    with open(path, "w") as f:
+                        f.write("")
+
+                except FileNotFoundError:
+                    self.log_manager.log(f"Error creating database {path}. File not found.")
+                    exit(1)
+            else:
+                exit(1)
 
         session = sqlite3.connect(path)
         cur = session.cursor()

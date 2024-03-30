@@ -11,7 +11,7 @@ SOCKFILE = os.path.join(SOCKDIR, "pomo.sock")
 SERVER_SOCKFILE = os.path.join(SOCKDIR, "server-pomo.sock")
 
 LOGFILE = "/tmp/pomo.log"
-DB_FILE = "~/Documents/pomo.db"
+DB_FILE = "~/.config/pomo/pomo.db"
 DB_TABLE_NAME = "sessions"
 
 DEFAULT_TAG = "other"

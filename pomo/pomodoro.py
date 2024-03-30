@@ -34,7 +34,7 @@ class Pomodoro:
         self.pending_db_update = False
         self.args = args
         self.log_manager = LogManager()
-        self.db_manager = DBManager()
+        self.db_manager = DBManager(args.database)
 
     @contextmanager
     def setup_listener(self):
