@@ -182,3 +182,16 @@ Fornece uma interface gráfica para gerenciar o módulo Pomo.
 
 *** Analytics
 A principal função desse módulo e fazer uma analise dos dados disponíveis no banco de dados, de forma que o usuário possa avaliar a sua performance com relação ao uso da técnica Pomodoro.
+
+Para obter os gráficos de performance, =analytics= pode ser executado com as datas de início de fim da análise no formato YYYY-MM-DD. Por exemplo, o comando abaixo realiza uma avaliação dos dados coletados no intervalo 2024-03-10 até 2024-03-20
+#+begin_src shell
+$ python3 -m analytics 2024-03-10 2024-03-20
+#+end_src
+
+
+Há também a opção de indicar o número de dias no passado. Por exemplo, o comando abaixo avalia os dados coletados nos últimos 7 dias.
+#+begin_src shell
+$ python3 -m analytics 7
+#+end_src
+
+As análises incluem a quantidade de horas em que a técnica Pomodoro foi empregada em cada dia do intervalo dado e também a quantidade de horas empregada em cada tipo de tag.
