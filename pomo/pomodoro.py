@@ -128,7 +128,7 @@ class Pomodoro:
 
         elif action == "end":
             if self.status.status == "work":
-                self.db_manager.finish_session(self.status.timer.get_elapsed())
+                self.db_manager.finish_session(self.status.timer.get_real_elapsed())
             status.next_timer()
 
         elif action == "lock":

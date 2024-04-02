@@ -25,8 +25,12 @@ class Timer:
     """
 
     def __init__(self, remtime, tag, timer_label):
-        self.total = remtime
+        # Total time defined by the user when creating the timer
+        self.total_time = remtime
+        # Time left in the timer
         self.time = remtime
+        # Total time after modifying the original total time
+        self.modified_time = remtime
         self.notified_finish = False
         self.notified_start = False
         self.sound_played = False
@@ -141,12 +145,19 @@ class Timer:
         Change the time
         """
         self.time = op(self.time, seconds)
+        self.modified_time = op(self.modified_time, seconds)
 
     def get_elapsed(self):
         """
         Get the elapsed time
         """
-        return self.total - self.time
+        return self.total_time - self.time
+
+    def get_real_elapsed(self):
+        """
+        Get the real elapsed time
+        """
+        return self.modified_time - self.time
 
     def play_sound(self, sound):
         """
