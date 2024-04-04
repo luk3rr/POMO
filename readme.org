@@ -152,7 +152,7 @@ O banco de dados é um arquivo =.db=, criado (caso não exista) em um diretório
 *** pomo
 Pomo é o módulo principal do programa. As principais classes desse módulo são:
 1. *DBManager*: Acessa e manipula o banco de dados
-2. *LogManager*: Gerencia as mensagens de log
+2. *LogManager*: Gerencia as mensagens de log. O arquivo de log pode ser localizado em =/tmp/pomo.log=
 3. *Status*: Gerencia cada worktime e breaktime
 4. *Timer*: Relógio que contabiliza o tempo a cada instante
 5. *Pomodoro*: Executa todos os comandos enviados pelo usuário e fornece os dados do programa através de sockets.

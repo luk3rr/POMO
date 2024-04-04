@@ -32,10 +32,12 @@ class DBManager:
         if not os.path.exists(directory):
             try:
                 os.makedirs(directory)
-                self.log_manager.log(f"Created directory {directory}")
+                self.log_manager.log(f"Created directory {directory}", level="DEBUG")
 
             except OSError:
-                self.log_manager.log(f"Error creating directory {directory}")
+                self.log_manager.log(
+                    f"Error creating directory {directory}", level="ERROR"
+                )
                 return False
 
         return True
@@ -50,7 +52,9 @@ class DBManager:
         path = os.path.expanduser(path)
 
         if not os.path.isfile(path):
-            self.log_manager.log(f"Database {path} does not exist, creating it...")
+            self.log_manager.log(
+                f"Database {path} does not exist, creating it...", level="DEBUG"
+            )
 
             if self.ensure_dir(path):
                 try:
@@ -59,7 +63,8 @@ class DBManager:
 
                 except FileNotFoundError:
                     self.log_manager.log(
-                        f"Error creating database {path}. File not found."
+                        f"Error creating database {path}. File not found.",
+                        level="ERROR",
                     )
                     exit(1)
             else:
@@ -69,12 +74,12 @@ class DBManager:
         cur = session.cursor()
         self.create_table(session, cur)
 
-        self.log_manager.log(f"Connected to database: {path}")
+        self.log_manager.log(f"Connected to database: {path}", level="INFO")
 
         try:
             yield cur
         finally:
-            self.log_manager.log("Closing database connection")
+            self.log_manager.log("Closing database connection", level="INFO")
             session.commit()
             session.close()
 
@@ -105,7 +110,7 @@ class DBManager:
                 session.execute(
                     f"INSERT INTO '{DB_TABLE_NAME}' VALUES ('{formatted_date}', '{formatted_time}', NULL, '{tag}');"
                 )
-                self.log_manager.log("Created session in database")
+                self.log_manager.log("Created session in database", level="INFO")
                 self.pending_db_update = True
 
     def finish_session(self, duration):
@@ -124,7 +129,7 @@ class DBManager:
                     """
                 )
 
-                self.log_manager.log("Finished session in database")
+                self.log_manager.log("Finished session in database", level="INFO")
                 self.pending_db_update = False
 
     def update_tag(self, tag):
@@ -143,12 +148,12 @@ class DBManager:
                     """
                 )
 
-                self.log_manager.log("Updated tag in database")
+                self.log_manager.log("Updated tag in database", level="INFO")
 
     def perform_query(self, query):
         """
         Perform a query in the database
         """
         with self.setup_connection(self.database) as session:
-            self.log_manager.log(f"Performing query: {query}")
+            self.log_manager.log(f"Performing query: {query}", level="DEBUG")
             return session.execute(query).fetchall()

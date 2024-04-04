@@ -165,10 +165,10 @@ class Timer:
         """
         try:
             Popen([PLAYER, sound], stdout=DEVNULL, stderr=DEVNULL)
-            self.log_manager.log(f"Playing sound {sound}")
+            self.log_manager.log(f"Playing sound {sound}", level="DEBUG")
         except Exception as e:
-            self.log_manager.log(f"Error playing sound {sound}")
-            self.log_manager.log(f"Error message: {str(e)}")
+            self.log_manager.log(f"Error playing sound {sound}", level="ERROR")
+            self.log_manager.log(f"Error message: {str(e)}", level="ERROR")
 
     def update_tag(self, tag):
         """

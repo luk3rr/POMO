@@ -55,7 +55,7 @@ class Server:
 
             while True:
                 client_socket, client_addr = server_socket.accept()
-                self.log_manager.log(f"Server socket created")
+                self.log_manager.log(f"Server socket created", level="DEBUG")
 
                 self.total_clients += 1
                 thread = threading.Thread(
@@ -65,7 +65,7 @@ class Server:
                 thread.start()
 
         except Exception as e:
-            self.log_manager.log(f"Error: {e}")
+            self.log_manager.log(f"Error: {e}", level="ERROR")
 
         finally:
             server_socket.close()
@@ -99,7 +99,7 @@ class Server:
                 client_socket.send(packet.encode())
 
         except BrokenPipeError:
-            self.log_manager.log(f"Lost connection to client {client_id}")
+            self.log_manager.log(f"Lost connection to client {client_id}", level="WARN")
 
         finally:
             self.total_clients -= 1

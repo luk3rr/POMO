@@ -10,8 +10,6 @@ import re
 
 from .config import LOGFILE
 
-CALLER_FUNCTION_NAME_LIMIT = 20
-
 
 class LogManager:
     """
@@ -34,29 +32,22 @@ class LogManager:
 
         return text
 
-    def log(self, text):
+    def log(self, text, level="INFO"):
         """
         Register a message in the log file
         """
 
         text = self.sanitize_message(text)
 
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        timestamp = datetime.datetime.now().strftime("%a %Y-%m-%d %H:%M:%S")
 
         # Get the calling function's name
         caller = inspect.stack()[1]
         caller_function_name = caller.function
         caller_class_name = caller.frame.f_locals.get("self", None).__class__.__name__
 
-        # Limit the length of caller_function_name
-        caller_function_name = (
-            caller_function_name[:CALLER_FUNCTION_NAME_LIMIT]
-            if len(caller_function_name) > CALLER_FUNCTION_NAME_LIMIT
-            else caller_function_name
-        )
-
         # Format the log message with aligned columns
-        message = f"{timestamp} - {caller_class_name}::{caller_function_name:<{CALLER_FUNCTION_NAME_LIMIT}}\t-> {text}"
+        message = f"[{timestamp}] [{level}] {caller_class_name}::{caller_function_name} : {text}"
 
         with open(LOGFILE, "a") as f:
             f.write(message + "\n")

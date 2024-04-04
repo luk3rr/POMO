@@ -112,7 +112,7 @@ class Pomodoro:
                         break
                 except socket.error as e:
                     self.log_manager.log(
-                        f"Lost connection to client. Printing buffer... {e}"
+                        f"Lost connection to client. Printing buffer... {e}", level="WARN"
                     )
                     break
 
@@ -203,10 +203,10 @@ class Pomodoro:
 
         except (FileNotFoundError, ConnectionRefusedError) as e:
             if warn:
-                self.log_manager.log(f"No instance of pomodoro listening, error: {e}")
+                self.log_manager.log(f"No instance of pomodoro listening, error: {e}", level="WARN")
         else:
             if not self.wait_for_socket_cleanup():
-                self.log_manager.log("Socket was not removed, assuming it's stale")
+                self.log_manager.log("Socket was not removed, assuming it's stale", level="WARN")
 
     def action_display(self, args):
         """
