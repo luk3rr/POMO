@@ -84,7 +84,7 @@ Mova o arquivo =pomo.desktop= para o seguinte diretório =~/.local/share/applica
 
 Por fim, abra o terminal e adicione o projeto ao path do seu SO (isso é necessário para que o comando =python3 -m pomo-gui= seja reconhecido sem a necessidade de determinar o caminho completo).
 #+begin_src sh
-$ export PATH=$PATH:/caminho/para/POMO
+$ export PYTHONPATH=$PYTHONPATH:/caminho/para/POMO
 #+end_src
 
 Após isso, o seu SO já deve ser capaz de localizar a aplicação através do launcher de aplicativos.
@@ -109,7 +109,7 @@ $ python3 -m pomo --worktime 2700 --breaktime 300 --database ~/Documents/pomo.db
 OBS.: Talvez seja interessante adicionar o projeto ao path do seu SO. Isso permitirá que você execute os comandos a partir de qualquer diretório. Para isso, você pode modificar o comando abaixo de forma que o caminho corresponda ao caminho onde esse projeto foi clonado:
 
 #+begin_src sh
-$ export PATH=$PATH:/caminho/para/POMO
+$ export PYTHONPATH=$PYTHONPATH:/caminho/para/POMO
 #+end_src
 
 *** Enviando comandos para a instância em background

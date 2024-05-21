@@ -4,6 +4,7 @@
 # Created on: March  6, 2024
 # Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
 
+
 import matplotlib.pyplot as plt
 import pandas as pd
 
