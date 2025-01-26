@@ -220,6 +220,7 @@ class PomodoroGUI:
         )
 
         # Mouse events
+        self.timer_tag.bind("<Button-1>", self.edit_tag)
         self.clock_label.bind("<Button-2>", self.middle_click_event)
         self.clock_label.bind("<Enter>", self.clock_label.focus())
         self.clock_label.bind("<Leave>", self.master.focus())
@@ -237,6 +238,56 @@ class PomodoroGUI:
         Scroll event
         """
         self.decrement_timer()
+
+    def edit_tag(self, event):
+        """
+        Allow editing of the tag text.
+        """
+        # Replace the label with an entry widget
+        self.timer_entry = tk.Entry(
+            self.canvas,
+            fg=self.color_timer_tag,
+            bg=self.color_window_bg,
+            font=(WINDOW.FONT, TAG.FONT_SIZE),
+        )
+        self.timer_entry.insert(
+            0, self.timer_tag.cget("text")
+        )  # Pre-fill with current text
+        # Save on Enter
+        self.timer_entry.bind("<Return>", self.save_tag)
+
+        # Cancel edit
+        self.timer_entry.bind("<FocusOut>", self.cancel_tag_edit)
+        self.timer_entry.bind("<Escape>", self.cancel_tag_edit)
+
+        self.canvas.create_window(TAG.WINDOW_SIZE[0], TAG.WINDOW_SIZE[1], window=self.timer_entry)
+        self.timer_entry.focus()
+
+    def cancel_tag_edit(self, event):
+        """
+        Cancel the tag edit.
+        """
+        self.timer_entry.destroy()
+
+    def save_tag(self, event):
+        """
+        Save the edited tag text and execute a command.
+        """
+        old_text = self.timer_tag.cget("text")
+        new_text = self.timer_entry.get()
+        self.timer_tag.config(text=new_text)  # Update the label
+        self.timer_entry.destroy()  # Remove the entry widget
+
+        new_text = new_text.strip()  # Remove leading/trailing whitespace
+
+        # do nothing if the text is empty or unchanged
+        if not new_text or new_text == old_text:
+            return
+
+        try:
+            subprocess.run(["python3", "-m", "pomo", "tag", new_text])
+        except subprocess.CalledProcessError as e:
+            print(f"Error executing command: {e}")
 
     def middle_click_event(self, event):
         """
